@@ -9,7 +9,7 @@ from tkinter import filedialog, messagebox, ttk, simpledialog
 from unified_app.adapters.launcher import open_folder
 from unified_app.adapters.projects import PROJECTS
 from unified_app.config import Action, PIP_HINTS, PYTHON, ROOT
-from unified_app.services.content_hunt import hunt_urls, save_source, refresh_sources
+from unified_app.services.content_hunt import hunt_inputs, save_source, refresh_sources
 from unified_app.services.content_sourcing import draft_top_candidates, export_source_digest, format_source_digest, refresh_saved_sources_deep
 from unified_app.services.daily_command import export_daily_plan, format_daily_plan
 from unified_app.services.db import init_db
@@ -807,23 +807,91 @@ class UnifiedApp(tk.Tk):
         self.status.set(msg); self._refresh_jobs()
         if not ok: messagebox.showwarning("Action",msg)
     def _build_hunt_tab(self) -> None:
-        ttk.Label(self.hunt_tab,text="Paste public links. The app saves metadata and candidate media/page links; review rights before reposting.",background="#f8fafc",foreground="#475569").pack(anchor="w")
-        self.hunt_input=tk.Text(self.hunt_tab,height=7,font=("Consolas",10)); self.hunt_input.pack(fill="x",pady=8)
-        buttons=ttk.Frame(self.hunt_tab); buttons.pack(fill="x",pady=(0,8)); ttk.Button(buttons,text="Hunt Content",command=self._hunt_content).pack(side="left",padx=(0,8)); ttk.Button(buttons,text="Save As Sources",command=self._save_hunt_sources).pack(side="left",padx=(0,8)); ttk.Button(buttons,text="Refresh Sources",command=self._refresh_sources_ui).pack(side="left",padx=(0,8)); ttk.Button(buttons,text="Deep Refresh",command=self._deep_refresh_sources_ui).pack(side="left",padx=(0,8)); ttk.Button(buttons,text="Digest",command=self._source_digest_ui).pack(side="left",padx=(0,8)); ttk.Button(buttons,text="Export Digest",command=self._source_digest_export_ui).pack(side="left",padx=(0,8)); ttk.Button(buttons,text="Draft Top",command=self._draft_top_ui).pack(side="left",padx=(0,8)); ttk.Button(buttons,text="Scan Local Videos",command=self._scan_local_assets_ui).pack(side="left",padx=(0,8)); ttk.Button(buttons,text="Make Drafts",command=self._make_drafts_ui).pack(side="left",padx=(0,8)); ttk.Button(buttons,text="Export Posting Plan",command=self._export_plan_ui).pack(side="left")
-        self.hunt_results=tk.Text(self.hunt_tab,height=18,font=("Consolas",9),wrap="word"); self.hunt_results.pack(fill="both",expand=True)
+        ttk.Label(
+            self.hunt_tab,
+            text="Enter a keyword or paste a public URL. Keyword searches find matching web, YouTube, or TikTok pages automatically.",
+            background="#f8fafc",
+            foreground="#475569",
+        ).pack(anchor="w")
+        self.hunt_input=tk.Text(self.hunt_tab,height=5,font=("Consolas",10))
+        self.hunt_input.pack(fill="x",pady=8)
+
+        search_options=ttk.Frame(self.hunt_tab)
+        search_options.pack(fill="x",pady=(0,8))
+        ttk.Label(search_options,text="Search in:").pack(side="left",padx=(0,5))
+        self.hunt_platform=tk.StringVar(value="All")
+        ttk.Combobox(
+            search_options,
+            textvariable=self.hunt_platform,
+            values=("All","Web","YouTube","TikTok"),
+            state="readonly",
+            width=12,
+        ).pack(side="left",padx=(0,12))
+        ttk.Label(search_options,text="Results:").pack(side="left",padx=(0,5))
+        self.hunt_limit=tk.IntVar(value=10)
+        ttk.Spinbox(
+            search_options,
+            from_=1,
+            to=25,
+            textvariable=self.hunt_limit,
+            width=5,
+        ).pack(side="left")
+
+        buttons=ttk.Frame(self.hunt_tab)
+        buttons.pack(fill="x",pady=(0,8))
+        ttk.Button(buttons,text="Search / Hunt Content",command=self._hunt_content,style="Accent.TButton").pack(side="left",padx=(0,8))
+        ttk.Button(buttons,text="Save As Sources",command=self._save_hunt_sources).pack(side="left",padx=(0,8))
+        ttk.Button(buttons,text="Refresh Sources",command=self._refresh_sources_ui).pack(side="left",padx=(0,8))
+        ttk.Button(buttons,text="Deep Refresh",command=self._deep_refresh_sources_ui).pack(side="left",padx=(0,8))
+        ttk.Button(buttons,text="Digest",command=self._source_digest_ui).pack(side="left",padx=(0,8))
+        ttk.Button(buttons,text="Export Digest",command=self._source_digest_export_ui).pack(side="left",padx=(0,8))
+        ttk.Button(buttons,text="Draft Top",command=self._draft_top_ui).pack(side="left",padx=(0,8))
+        ttk.Button(buttons,text="Scan Local Videos",command=self._scan_local_assets_ui).pack(side="left",padx=(0,8))
+        ttk.Button(buttons,text="Make Drafts",command=self._make_drafts_ui).pack(side="left",padx=(0,8))
+        ttk.Button(buttons,text="Export Posting Plan",command=self._export_plan_ui).pack(side="left")
+        self.hunt_results=tk.Text(self.hunt_tab,height=18,font=("Consolas",9),wrap="word")
+        self.hunt_results.pack(fill="both",expand=True)
+
     def _hunt_content(self) -> None:
         vals=[x.strip() for x in self.hunt_input.get("1.0",tk.END).splitlines() if x.strip()]
-        if not vals: messagebox.showinfo("Content Hunt","Paste at least one link first."); return
-        self.status.set("Hunting content candidates..."); self.hunt_results.delete("1.0",tk.END)
+        if not vals:
+            messagebox.showinfo("Content Hunt","Enter at least one keyword or public URL first.")
+            return
+        platform=(self.hunt_platform.get() or "All").strip().lower()
+        try:
+            limit=max(1,min(int(self.hunt_limit.get()),25))
+        except (TypeError,ValueError,tk.TclError):
+            limit=10
+        self.status.set(f"Searching {platform} content...")
+        self.hunt_results.delete("1.0",tk.END)
+        self.hunt_results.insert("1.0","Searching the web and saving suitable matches...")
         def worker():
-            c,e=hunt_urls(vals); self.after(0,lambda:self._show_hunt_results(c,e))
+            c,e=hunt_inputs(vals,platform=platform,limit=limit)
+            self.after(0,lambda:self._show_hunt_results(c,e))
         threading.Thread(target=worker,daemon=True).start()
+
     def _show_hunt_results(self,cands: list[Candidate],errs: list[str]) -> None:
         lines=[]
-        for c in cands:
-            pack=content_pack(c.title,c.description); lines += [f"SAVED [{c.source_type}] {c.title}",f"  URL: {c.url}",f"  Media links found: {len(c.media_urls)}",f"  Hashtags: {' '.join(pack['hashtags'])}",f"  Caption: {pack['captions'][0]}",f"  Note: {c.notes}",""]
-        lines += ["ERROR "+e for e in errs]
-        self.hunt_results.insert("1.0","\n".join(lines) if lines else "No candidates found."); self.status.set(f"Saved {len(cands)} candidates; {len(errs)} errors"); self._refresh_library(); self._refresh_jobs()
+        for index,c in enumerate(cands,start=1):
+            pack=content_pack(c.title,c.description)
+            lines += [
+                f"{index}. SAVED [{c.source_type.upper()}] {c.title}",
+                f"   URL: {c.url}",
+                f"   Summary: {c.description or 'No summary supplied by the search provider.'}",
+                f"   Media links found: {len(c.media_urls)}",
+                f"   Hashtags: {' '.join(pack['hashtags'])}",
+                f"   Caption: {pack['captions'][0]}",
+                f"   Note: {c.notes}",
+                "",
+            ]
+        if errs:
+            lines += ["SEARCH NOTICE / ERROR: "+error for error in errs]
+        self.hunt_results.delete("1.0",tk.END)
+        self.hunt_results.insert("1.0","\n".join(lines) if lines else "No matching candidates found.")
+        self.status.set(f"Saved {len(cands)} candidates; {len(errs)} notices/errors")
+        self._refresh_library()
+        self._refresh_jobs()
+
     def _scan_local_assets_ui(self) -> None:
         count=scan_local_assets(); self.status.set(f"Scanned {count} local video assets"); self._refresh_library(); self._refresh_jobs()
     def _build_library_tab(self) -> None:
