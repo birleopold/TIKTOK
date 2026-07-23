@@ -1,10 +1,10 @@
-﻿from __future__ import annotations
+from __future__ import annotations
 
 from pathlib import Path
 from tkinter import simpledialog
 
 from unified_app.adapters.launcher import install_requirements, open_folder, run_script
-from unified_app.config import Action, Project
+from unified_app.config import Action, Project, ROOT
 
 
 def uploader_login() -> tuple[bool, str]:
@@ -18,7 +18,45 @@ def project_open_action(folder: str) -> Action:
     return Action("Open folder", "Open this project folder.", lambda folder=folder: open_folder(folder))
 
 
+def open_hunt_downloads() -> tuple[bool, str]:
+    folder = Path("downloads") / "hunt"
+    (ROOT / folder).mkdir(parents=True, exist_ok=True)
+    return open_folder(str(folder))
+
+
 PROJECTS = (
+    Project(
+        "Hunt Downloads",
+        ".",
+        "Content Sourcing",
+        "active",
+        (
+            "Multi-select saved Hunt candidates, preview public sources, download "
+            "authorized videos, preserve source metadata, and index files locally."
+        ),
+        (
+            "multi-select results",
+            "preview source",
+            "video check",
+            "public video download",
+            "source metadata",
+            "Library indexing",
+        ),
+        (
+            Action(
+                "Launch Hunt Downloads",
+                "Choose saved Hunt results and download only authorized videos.",
+                lambda: run_script(".", "hunt_downloader.py"),
+                ".",
+                "hunt_downloader.py",
+            ),
+            Action(
+                "Open Hunt downloads",
+                "Open the local Hunt download folder.",
+                open_hunt_downloads,
+            ),
+        ),
+    ),
     Project(
         "TikTok Auto Uploader",
         "TiktokAutoUploader-main",

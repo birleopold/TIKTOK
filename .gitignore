@@ -1,0 +1,5 @@
+
+# Hunt video downloads and temporary files
+downloads/hunt/
+*.part
+*.ytdl
