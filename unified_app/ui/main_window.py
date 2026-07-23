@@ -34,22 +34,143 @@ from unified_app.services.tiktok_profile import analyze_tiktok_profile_url, form
 from unified_app.services.upload_queue import account_rows, add_to_queue, assign_queue_account, auto_assign_healthy_account, cancel_queue_item, import_browser_session, import_cookie_file, queue_ready_items, queue_rows, queue_summary_lines, run_login, run_queue_item, sync_accounts, upload_preflight
 from unified_app.services.workflows import WORKFLOW_PRESETS, format_workflow, run_workflow, workflow_readiness
 
+UI_COLORS = {
+    "bg": "#f4f7fb",
+    "panel": "#ffffff",
+    "panel_alt": "#f8fafc",
+    "ink": "#172033",
+    "muted": "#667085",
+    "line": "#d9e2ec",
+    "accent": "#0ea5a6",
+    "accent_dark": "#0f766e",
+    "warm": "#f97316",
+    "good": "#16a34a",
+    "warn": "#d97706",
+    "bad": "#dc2626",
+    "code_bg": "#101828",
+    "code_fg": "#e7edf5",
+}
+
+TAB_NAMES = (
+    ("daily_tab", "Daily"),
+    ("creator_tab", "Creator OS"),
+    ("workflow_tab", "Paste & Go"),
+    ("tiktok_tab", "TikTok"),
+    ("presets_tab", "Presets"),
+    ("automations_tab", "Automations"),
+    ("upload_tab", "Upload"),
+    ("settings_tab", "Brand"),
+    ("doctor_tab", "Doctor"),
+    ("projects_tab", "Projects"),
+    ("hunt_tab", "Hunt"),
+    ("drafts_tab", "Drafts"),
+    ("library_tab", "Library"),
+    ("jobs_tab", "Jobs"),
+    ("source_tab", "Source"),
+    ("help_tab", "Commands"),
+)
+
 class UnifiedApp(tk.Tk):
     def __init__(self) -> None:
         super().__init__(); init_db(); self.python_files = scan_python_files(); self.status = tk.StringVar(value="Ready"); self.current_detection = None
-        self.title("Unified TikTok Python App"); self.geometry("1240x800"); self.minsize(1040, 660); self.configure(bg="#f8fafc"); self._build()
+        self._pulse = 0; self._dashboard_vars = {}
+        self.title("Unified TikTok Creator Studio"); self.geometry("1320x860"); self.minsize(1120, 720); self.configure(bg=UI_COLORS["bg"]); self._build()
     def _build(self) -> None:
-        style=ttk.Style(self); style.theme_use("clam")
-        for name,bg in (("TFrame","#f8fafc"),("Card.TFrame","#ffffff")): style.configure(name, background=bg)
-        style.configure("Title.TLabel", background="#f8fafc", foreground="#0f172a", font=("Segoe UI",18,"bold")); style.configure("Heading.TLabel", background="#ffffff", foreground="#0f172a", font=("Segoe UI",11,"bold")); style.configure("Body.TLabel", background="#ffffff", foreground="#475569", font=("Segoe UI",9)); style.configure("TButton", font=("Segoe UI",9), padding=(10,6))
-        header=ttk.Frame(self, padding=(18,14)); header.pack(fill="x")
-        ttk.Label(header,text="Unified TikTok Python App",style="Title.TLabel").pack(side="left")
-        ttk.Label(header,text=f"{len(PROJECTS)} projects | {len(self.python_files)} Python files | no API keys",background="#f8fafc",foreground="#64748b").pack(side="right")
-        nb=ttk.Notebook(self); nb.pack(fill="both",expand=True,padx=18,pady=(0,18))
-        self.daily_tab=ttk.Frame(nb,padding=10); self.creator_tab=ttk.Frame(nb,padding=10); self.workflow_tab=ttk.Frame(nb,padding=10); self.tiktok_tab=ttk.Frame(nb,padding=10); self.presets_tab=ttk.Frame(nb,padding=10); self.automations_tab=ttk.Frame(nb,padding=10); self.upload_tab=ttk.Frame(nb,padding=10); self.settings_tab=ttk.Frame(nb,padding=10); self.doctor_tab=ttk.Frame(nb,padding=10); self.projects_tab=ttk.Frame(nb,padding=10); self.hunt_tab=ttk.Frame(nb,padding=10); self.drafts_tab=ttk.Frame(nb,padding=10); self.library_tab=ttk.Frame(nb,padding=10); self.jobs_tab=ttk.Frame(nb,padding=10); self.source_tab=ttk.Frame(nb,padding=10); self.help_tab=ttk.Frame(nb,padding=10)
-        for tab,name in ((self.daily_tab,"Daily"),(self.creator_tab,"Creator OS"),(self.workflow_tab,"Paste & Go"),(self.tiktok_tab,"TikTok Analyzer"),(self.presets_tab,"Workflow Presets"),(self.automations_tab,"No-Key Automations"),(self.upload_tab,"Accounts & Upload Queue"),(self.settings_tab,"Brand Settings"),(self.doctor_tab,"Setup Doctor"),(self.projects_tab,"Projects"),(self.hunt_tab,"Content Hunt"),(self.drafts_tab,"Draft Queue"),(self.library_tab,"Library & Analytics"),(self.jobs_tab,"Jobs"),(self.source_tab,"Python Source"),(self.help_tab,"Run Commands")): nb.add(tab,text=name)
+        self._apply_theme()
+        self.hero_canvas=tk.Canvas(self,height=92,bg=UI_COLORS["bg"],highlightthickness=0)
+        self.hero_canvas.pack(fill="x")
+        self.hero_canvas.bind("<Configure>",self._draw_header)
+        self.main_shell=ttk.Frame(self,style="Shell.TFrame",padding=(18,8,18,14)); self.main_shell.pack(fill="both",expand=True)
+        nb=ttk.Notebook(self.main_shell,style="Studio.TNotebook"); nb.pack(fill="both",expand=True)
+        for attr, name in TAB_NAMES:
+            tab=ttk.Frame(nb,padding=14,style="Page.TFrame"); setattr(self,attr,tab); nb.add(tab,text=name)
         self._build_daily_tab(); self._build_creator_tab(); self._build_workflow_tab(); self._build_tiktok_tab(); self._build_presets_tab(); self._build_automations_tab(); self._build_upload_tab(); self._build_settings_tab(); self._build_doctor_tab(); self._build_projects_tab(); self._build_hunt_tab(); self._build_drafts_tab(); self._build_library_tab(); self._build_jobs_tab(); self._build_source_tab(); self._build_help_tab()
-        ttk.Label(self,textvariable=self.status,background="#e2e8f0",foreground="#0f172a",padding=(10,5)).pack(fill="x")
+        self.status_bar=tk.Label(self,textvariable=self.status,bg="#dbeafe",fg=UI_COLORS["ink"],anchor="w",padx=14,pady=7,font=("Segoe UI",9,"bold"))
+        self.status_bar.pack(fill="x")
+        self._style_existing_widgets(self)
+        self._animate_status()
+
+    def _apply_theme(self) -> None:
+        style=ttk.Style(self); style.theme_use("clam")
+        style.configure("Shell.TFrame", background=UI_COLORS["bg"])
+        style.configure("Page.TFrame", background=UI_COLORS["bg"])
+        style.configure("TFrame", background=UI_COLORS["bg"])
+        style.configure("Card.TFrame", background=UI_COLORS["panel"], relief="flat")
+        style.configure("Hero.TFrame", background=UI_COLORS["ink"])
+        style.configure("Title.TLabel", background=UI_COLORS["bg"], foreground=UI_COLORS["ink"], font=("Segoe UI",20,"bold"))
+        style.configure("Heading.TLabel", background=UI_COLORS["panel"], foreground=UI_COLORS["ink"], font=("Segoe UI",11,"bold"))
+        style.configure("Body.TLabel", background=UI_COLORS["panel"], foreground=UI_COLORS["muted"], font=("Segoe UI",9))
+        style.configure("Muted.TLabel", background=UI_COLORS["bg"], foreground=UI_COLORS["muted"], font=("Segoe UI",9))
+        style.configure("TButton", font=("Segoe UI",9,"bold"), padding=(11,7), background=UI_COLORS["panel"], foreground=UI_COLORS["ink"], borderwidth=1, focusthickness=0)
+        style.map("TButton", background=[("active","#e6fffb"),("pressed","#ccfbf1")], foreground=[("active",UI_COLORS["accent_dark"])])
+        style.configure("Accent.TButton", background=UI_COLORS["accent"], foreground="#ffffff")
+        style.map("Accent.TButton", background=[("active",UI_COLORS["accent_dark"]),("pressed",UI_COLORS["accent_dark"])], foreground=[("active","#ffffff")])
+        style.configure("Studio.TNotebook", background=UI_COLORS["bg"], borderwidth=0, tabmargins=(0,0,0,0))
+        style.configure("Studio.TNotebook.Tab", padding=(13,8), font=("Segoe UI",9,"bold"), background="#e9eef5", foreground=UI_COLORS["muted"])
+        style.map("Studio.TNotebook.Tab", background=[("selected",UI_COLORS["panel"]),("active","#dff7f5")], foreground=[("selected",UI_COLORS["accent_dark"]),("active",UI_COLORS["ink"])])
+        style.configure("Treeview", background=UI_COLORS["panel"], fieldbackground=UI_COLORS["panel"], foreground=UI_COLORS["ink"], rowheight=28, borderwidth=0, font=("Segoe UI",9))
+        style.configure("Treeview.Heading", background="#edf2f7", foreground=UI_COLORS["ink"], font=("Segoe UI",9,"bold"), padding=(8,6))
+        style.map("Treeview", background=[("selected",UI_COLORS["accent"])], foreground=[("selected","#ffffff")])
+        style.configure("TEntry", fieldbackground=UI_COLORS["panel"], foreground=UI_COLORS["ink"], bordercolor=UI_COLORS["line"], padding=(8,6))
+
+    def _draw_header(self, event=None) -> None:
+        canvas=self.hero_canvas; canvas.delete("all")
+        w=max(canvas.winfo_width(),900); h=92
+        canvas.create_rectangle(0,0,w,h,fill="#101828",outline="")
+        canvas.create_rectangle(0,h-5,w,h,fill=UI_COLORS["accent"],outline="")
+        canvas.create_rectangle(w-260,0,w,h,fill="#12313f",outline="")
+        canvas.create_rectangle(w-260,h-5,w,h,fill=UI_COLORS["warm"],outline="")
+        canvas.create_text(24,27,anchor="w",text="Unified TikTok Creator Studio",fill="#ffffff",font=("Segoe UI",22,"bold"))
+        canvas.create_text(25,60,anchor="w",text="Create, prepare, schedule, upload, track, and repurpose content from one local Python app",fill="#cbd5e1",font=("Segoe UI",10))
+        canvas.create_text(w-24,31,anchor="e",text=f"{len(PROJECTS)} projects",fill="#ffffff",font=("Segoe UI",12,"bold"))
+        canvas.create_text(w-24,58,anchor="e",text=f"{len(self.python_files)} Python files | no API keys",fill="#cbd5e1",font=("Segoe UI",9))
+
+    def _style_existing_widgets(self, widget) -> None:
+        for child in widget.winfo_children():
+            if isinstance(child, tk.Text):
+                child.configure(bg=UI_COLORS["code_bg"],fg=UI_COLORS["code_fg"],insertbackground="#ffffff",selectbackground=UI_COLORS["accent"],relief="flat",bd=0,padx=12,pady=10,spacing1=2,spacing3=2)
+            elif isinstance(child, tk.Listbox):
+                child.configure(bg=UI_COLORS["panel"],fg=UI_COLORS["ink"],selectbackground=UI_COLORS["accent"],selectforeground="#ffffff",relief="flat",bd=0,highlightthickness=1,highlightbackground=UI_COLORS["line"])
+            elif isinstance(child, tk.Canvas) and child is not getattr(self,"hero_canvas",None):
+                child.configure(bg=UI_COLORS["bg"],highlightthickness=0)
+            self._style_existing_widgets(child)
+
+    def _animate_status(self) -> None:
+        palette=("#dbeafe","#ccfbf1","#ffedd5","#e0f2fe")
+        if hasattr(self,"status_bar"):
+            self.status_bar.configure(bg=palette[self._pulse % len(palette)])
+        self._pulse += 1
+        self.after(1200,self._animate_status)
+
+
+    def _dashboard_card(self, parent: ttk.Frame, title: str, value_key: str, accent: str) -> None:
+        card=tk.Frame(parent,bg=UI_COLORS["panel"],highlightthickness=1,highlightbackground=UI_COLORS["line"],bd=0)
+        card.pack(side="left",fill="x",expand=True,padx=(0,10),ipadx=12,ipady=10)
+        tk.Frame(card,bg=accent,height=4).pack(fill="x",side="top")
+        tk.Label(card,text=title,bg=UI_COLORS["panel"],fg=UI_COLORS["muted"],font=("Segoe UI",9,"bold"),anchor="w").pack(fill="x",padx=12,pady=(10,0))
+        var=tk.StringVar(value="0"); self._dashboard_vars[value_key]=var
+        tk.Label(card,textvariable=var,bg=UI_COLORS["panel"],fg=UI_COLORS["ink"],font=("Segoe UI",18,"bold"),anchor="w").pack(fill="x",padx=12,pady=(0,10))
+
+    def _build_dashboard_cards(self, parent: ttk.Frame) -> None:
+        row=ttk.Frame(parent,style="Page.TFrame"); row.pack(fill="x",pady=(0,12))
+        self._dashboard_card(row,"Drafts","drafts",UI_COLORS["accent"])
+        self._dashboard_card(row,"Ready","ready",UI_COLORS["good"])
+        self._dashboard_card(row,"Queued","queued",UI_COLORS["warm"])
+        self._dashboard_card(row,"Accounts","accounts",UI_COLORS["accent_dark"])
+        self._dashboard_card(row,"Jobs","jobs",UI_COLORS["warn"])
+
+    def _refresh_dashboard_cards(self) -> None:
+        if not getattr(self,"_dashboard_vars",None): return
+        try:
+            counts=library_counts(); qrows=queue_rows(500); accounts=account_rows(); jobs=recent_jobs(50)
+            self._dashboard_vars.get("drafts",tk.StringVar()).set(str(counts.get("draft",0)))
+            self._dashboard_vars.get("ready",tk.StringVar()).set(str(counts.get("ready",0)))
+            self._dashboard_vars.get("queued",tk.StringVar()).set(str(sum(1 for q in qrows if q.status == "queued")))
+            healthy=sum(1 for row in accounts if row[2] == "healthy")
+            self._dashboard_vars.get("accounts",tk.StringVar()).set(f"{healthy}/{len(accounts)}")
+            self._dashboard_vars.get("jobs",tk.StringVar()).set(str(len(jobs)))
+        except Exception:
+            pass
 
     def _build_creator_tab(self) -> None:
         top=ttk.Frame(self.creator_tab); top.pack(fill="x",pady=(0,8))
@@ -164,6 +285,7 @@ class UnifiedApp(tk.Tk):
         if not ok: messagebox.showwarning("Backup",msg)
 
     def _build_daily_tab(self) -> None:
+        self._build_dashboard_cards(self.daily_tab)
         top=ttk.Frame(self.daily_tab); top.pack(fill="x",pady=(0,8))
         ttk.Button(top,text="Refresh",command=self._daily_refresh).pack(side="left",padx=(0,8))
         ttk.Button(top,text="Export Daily Plan",command=self._daily_export).pack(side="left",padx=(0,8))
@@ -176,7 +298,7 @@ class UnifiedApp(tk.Tk):
         if not hasattr(self,"daily_output"): return
         self.daily_output.delete("1.0",tk.END); self.daily_output.insert("1.0",format_daily_plan())
         self.status.set("Daily command plan refreshed")
-        self._refresh_jobs()
+        self._refresh_dashboard_cards(); self._refresh_jobs()
     def _daily_export(self) -> None:
         path=export_daily_plan(); self.status.set(f"Exported {path.relative_to(ROOT)}"); self._refresh_jobs(); messagebox.showinfo("Daily Plan","Exported:\n"+str(path))
 
@@ -464,6 +586,25 @@ class UnifiedApp(tk.Tk):
         self._refresh_library(); self._refresh_drafts(); self._refresh_jobs()
         if not ok: messagebox.showwarning("Batch Campaign",msg)
 
+
+    def _tag_tree_rows(self, tree: ttk.Treeview) -> None:
+        tree.tag_configure("ready", background="#ecfdf5", foreground="#065f46")
+        tree.tag_configure("healthy", background="#ecfdf5", foreground="#065f46")
+        tree.tag_configure("queued", background="#fff7ed", foreground="#9a3412")
+        tree.tag_configure("scheduled", background="#eff6ff", foreground="#1d4ed8")
+        tree.tag_configure("uploaded", background="#f0fdfa", foreground="#0f766e")
+        tree.tag_configure("failed", background="#fef2f2", foreground="#991b1b")
+        tree.tag_configure("cancelled", background="#f1f5f9", foreground="#64748b")
+        tree.tag_configure("missing", background="#fef2f2", foreground="#991b1b")
+        tree.tag_configure("expired", background="#fffbeb", foreground="#92400e")
+
+    def _row_tag(self, status: str) -> tuple[str, ...]:
+        status=(status or "").lower()
+        for key in ("healthy","ready","queued","scheduled","uploaded","failed","cancelled","missing","expired"):
+            if key in status:
+                return (key,)
+        return ()
+
     def _build_upload_tab(self) -> None:
         ttk.Label(self.upload_tab,text="Local TikTok sessions and upload queue. Login uses the existing uploader browser flow; no API keys.",background="#f8fafc",foreground="#475569").pack(anchor="w",pady=(0,8))
         top=ttk.Frame(self.upload_tab); top.pack(fill="x",pady=(0,8))
@@ -486,12 +627,12 @@ class UnifiedApp(tk.Tk):
         self.accounts_tree=ttk.Treeview(self.upload_tab,columns=("id","username","status","cookie","checked","notes"),show="headings",height=5)
         for col,width in (("id",50),("username",150),("status",90),("cookie",360),("checked",180),("notes",360)):
             self.accounts_tree.heading(col,text=col.title()); self.accounts_tree.column(col,width=width,stretch=col in {"cookie","notes"})
-        self.accounts_tree.pack(fill="x",pady=(0,8))
+        self.accounts_tree.pack(fill="x",pady=(0,8)); self._tag_tree_rows(self.accounts_tree)
         ttk.Label(self.upload_tab,text="Upload Queue",background="#f8fafc",foreground="#0f172a",font=("Segoe UI",10,"bold")).pack(anchor="w")
         self.queue_tree=ttk.Treeview(self.upload_tab,columns=("id","status","account","source","title","scheduled","library"),show="headings")
         for col,width in (("id",50),("status",90),("account",130),("source",330),("title",240),("scheduled",160),("library",100)):
             self.queue_tree.heading(col,text=col.title()); self.queue_tree.column(col,width=width,stretch=col in {"source","title"})
-        self.queue_tree.pack(fill="both",expand=True,pady=(0,8))
+        self.queue_tree.pack(fill="both",expand=True,pady=(0,8)); self._tag_tree_rows(self.queue_tree)
         self.queue_output=tk.Text(self.upload_tab,height=5,font=("Consolas",9),wrap="word")
         self.queue_output.pack(fill="x")
         self._upload_sync()
@@ -508,10 +649,10 @@ class UnifiedApp(tk.Tk):
         self.queue_output.delete("1.0",tk.END); self.queue_output.insert("1.0",msg)
     def _upload_sync(self) -> None:
         sync_accounts(); self.accounts_tree.delete(*self.accounts_tree.get_children()); self.queue_tree.delete(*self.queue_tree.get_children())
-        for row in account_rows(): self.accounts_tree.insert("",tk.END,values=row)
-        for row in queue_rows(): self.queue_tree.insert("",tk.END,values=(row.id,row.status,row.account,row.source_ref,row.title,row.scheduled_for,row.library_key))
+        for row in account_rows(): self.accounts_tree.insert("",tk.END,values=row,tags=self._row_tag(row[2]))
+        for row in queue_rows(): self.queue_tree.insert("",tk.END,values=(row.id,row.status,row.account,row.source_ref,row.title,row.scheduled_for,row.library_key),tags=self._row_tag(row.status))
         self.upload_summary.set(" | ".join(queue_summary_lines()) or "Queue empty")
-        self._refresh_jobs()
+        self._refresh_dashboard_cards(); self._refresh_jobs()
     def _upload_login(self) -> None:
         username=simpledialog.askstring("TikTok Login","Account name to save locally:",initialvalue=self._selected_account())
         if not username: return
@@ -702,7 +843,7 @@ class UnifiedApp(tk.Tk):
         self.library_tree=ttk.Treeview(self.library_tab,columns=("key","type","title","status","scheduled","account","source","created"),show="headings")
         for col,width in (("key",90),("type",110),("title",260),("status",90),("scheduled",170),("account",120),("source",360),("created",170)):
             self.library_tree.heading(col,text=col.title()); self.library_tree.column(col,width=width,stretch=col in {"title","source"})
-        self.library_tree.pack(fill="both",expand=True)
+        self.library_tree.pack(fill="both",expand=True); self._tag_tree_rows(self.library_tree)
         self.analytics_output=tk.Text(self.library_tab,height=11,font=("Consolas",9),wrap="word")
         self.analytics_output.pack(fill="x",pady=(8,0))
         self._refresh_library()
@@ -718,7 +859,8 @@ class UnifiedApp(tk.Tk):
         self.library_summary.set((base + " || " + prod)[:900])
         self.library_tree.delete(*self.library_tree.get_children())
         for row in production_rows():
-            self.library_tree.insert("",tk.END,values=(row.key,row.item_type,row.title,row.status,row.scheduled_for,row.account,row.source,row.created_at))
+            self.library_tree.insert("",tk.END,values=(row.key,row.item_type,row.title,row.status,row.scheduled_for,row.account,row.source,row.created_at),tags=self._row_tag(row.status))
+        self._refresh_dashboard_cards()
         if hasattr(self,"analytics_output"):
             self.analytics_output.delete("1.0",tk.END); self.analytics_output.insert("1.0",format_analytics_report())
     def _analytics_export_ui(self) -> None:
@@ -752,11 +894,12 @@ class UnifiedApp(tk.Tk):
         top=ttk.Frame(self.jobs_tab); top.pack(fill="x",pady=(0,8)); ttk.Button(top,text="Refresh",command=self._refresh_jobs).pack(side="right")
         self.jobs_tree=ttk.Treeview(self.jobs_tab,columns=("id","kind","target","status","message","created"),show="headings")
         for col,width in (("id",50),("kind",90),("target",260),("status",90),("message",360),("created",170)): self.jobs_tree.heading(col,text=col.title()); self.jobs_tree.column(col,width=width,stretch=col in {"target","message"})
-        self.jobs_tree.pack(fill="both",expand=True); self._refresh_jobs()
+        self.jobs_tree.pack(fill="both",expand=True); self._tag_tree_rows(self.jobs_tree); self._refresh_jobs()
     def _refresh_jobs(self) -> None:
         if not hasattr(self,"jobs_tree"): return
         self.jobs_tree.delete(*self.jobs_tree.get_children())
-        for row in recent_jobs(): self.jobs_tree.insert("",tk.END,values=row)
+        for row in recent_jobs(): self.jobs_tree.insert("",tk.END,values=row,tags=self._row_tag(row[3]))
+        self._refresh_dashboard_cards()
     def _build_source_tab(self) -> None:
         left=ttk.Frame(self.source_tab); left.pack(side="left",fill="both",expand=True); right=ttk.Frame(self.source_tab); right.pack(side="right",fill="both",expand=True,padx=(10,0)); var=tk.StringVar(); ent=ttk.Entry(left,textvariable=var); ent.pack(fill="x",pady=(0,8)); ent.insert(0,"type to filter Python files"); lst=tk.Listbox(left,font=("Consolas",9)); lst.pack(fill="both",expand=True); prev=tk.Text(right,wrap="none",font=("Consolas",9)); prev.pack(fill="both",expand=True)
         def refresh(*_):

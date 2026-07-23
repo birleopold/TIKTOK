@@ -4,10 +4,13 @@ import html
 import json
 import re
 import urllib.parse
+import urllib.request
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from typing import Any
 
+from unified_app.config import USER_AGENT
+from unified_app.services.browser_cookies import cookie_header_for_tiktok, read_tiktok_cookies
 from unified_app.services.content_hunt import fetch_url, normalize_url, save_source
 from unified_app.services.db import connect, init_db, now_iso
 from unified_app.services.drafts import content_pack
@@ -111,13 +114,19 @@ def _video_url(username: str, video_id: str) -> str:
 def _extract_videos_from_text(page: str, username: str) -> list[TikTokVideoInfo]:
     videos: list[TikTokVideoInfo] = []
     seen: set[str] = set()
-    for url in re.findall(r"https://www\.tiktok\.com/@[^\"'\\< ]+/video/\d+", page):
+    expanded = html.unescape(page).replace("\\u002F", "/").replace("\\/", "/")
+    for url in re.findall(r"https://(?:www\.)?tiktok\.com/@[^\"'\\< >]+/video/\d+", expanded):
         clean = url.split("?")[0]
         if clean in seen:
             continue
         seen.add(clean)
         videos.append(TikTokVideoInfo(url=clean))
-    for video_id in re.findall(r'(?:"id"|"videoId")\s*:\s*"(\d{8,})"', page):
+    for video_id in re.findall(r'(?:(?:"|\\")id(?:"|\\")|(?:"|\\")videoId(?:"|\\"))\s*:\s*(?:"|\\")?(\d{8,})', expanded):
+        url = _video_url(username, video_id)
+        if url not in seen:
+            seen.add(url)
+            videos.append(TikTokVideoInfo(url=url))
+    for video_id in re.findall(r'/video/(\d{8,})', expanded):
         url = _video_url(username, video_id)
         if url not in seen:
             seen.add(url)
@@ -185,7 +194,7 @@ def _caption_patterns(videos: list[TikTokVideoInfo], bio: str, fallback_title: s
         title = video.title.strip()
         if title:
             starts.append(title[:90])
-    patterns = starts[:5] or pack["hooks"][:3]
+    patterns = starts[:5] or ["No recent captions visible yet; use the ideas below as draft prompts, not detected patterns."]
     ideas = pack["hooks"][:5]
     return hashtags[:12], patterns[:6], ideas[:6]
 
@@ -233,6 +242,101 @@ def save_profile_snapshot(report: TikTokProfileReport) -> None:
         db.commit()
 
 
+
+def _fetch_with_browser_session(url: str) -> tuple[str, str]:
+    cookie_header, cookie_note = cookie_header_for_tiktok("auto")
+    if not cookie_header:
+        return "", cookie_note
+    req = urllib.request.Request(
+        url,
+        headers={
+            "User-Agent": USER_AGENT,
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+            "Accept-Language": "en-US,en;q=0.9",
+            "Referer": "https://www.tiktok.com/",
+            "Cookie": cookie_header,
+        },
+    )
+    with urllib.request.urlopen(req, timeout=25) as r:
+        data = r.read(4_000_000)
+        charset = r.headers.get_content_charset() or "utf-8"
+    return data.decode(charset, errors="replace"), cookie_note
+
+
+
+def _playwright_cookie(cookie: dict) -> dict | None:
+    name = str(cookie.get("name") or "").strip()
+    value = str(cookie.get("value") or "")
+    domain = str(cookie.get("domain") or ".tiktok.com")
+    if not name:
+        return None
+    out = {
+        "name": name,
+        "value": value,
+        "domain": domain,
+        "path": str(cookie.get("path") or "/"),
+        "httpOnly": bool(cookie.get("httpOnly", False)),
+        "secure": bool(cookie.get("secure", True)),
+    }
+    expiry = cookie.get("expiry")
+    if expiry:
+        try:
+            expires = int(expiry)
+            if expires > 0:
+                out["expires"] = expires
+        except (TypeError, ValueError):
+            pass
+    same_site = cookie.get("sameSite")
+    if same_site in {"Strict", "Lax", "None"}:
+        out["sameSite"] = same_site
+    return out
+
+
+def _fetch_with_playwright_session(url: str) -> tuple[str, str]:
+    cookies, cookie_note = read_tiktok_cookies("auto")
+    if not cookies:
+        return "", cookie_note
+    try:
+        from playwright.sync_api import sync_playwright
+    except Exception as exc:
+        return "", f"Playwright is not available: {exc}"
+    prepared = [c for c in (_playwright_cookie(cookie) for cookie in cookies) if c]
+    if not prepared:
+        return "", "No usable TikTok cookies could be prepared for Playwright."
+    with sync_playwright() as pw:
+        browser = pw.chromium.launch(headless=True)
+        context = browser.new_context(
+            viewport={"width": 1366, "height": 900},
+            user_agent=USER_AGENT,
+            locale="en-US",
+        )
+        context.add_cookies(prepared)
+        page = context.new_page()
+        page.goto(url, wait_until="domcontentloaded", timeout=45000)
+        page.wait_for_timeout(3500)
+        for _ in range(3):
+            page.mouse.wheel(0, 1200)
+            page.wait_for_timeout(1200)
+        content = page.content()
+        browser.close()
+    return content, "Rendered page with Python Playwright and saved TikTok browser cookies: " + cookie_note
+
+def _extract_page_data(page: str, username: str) -> tuple[str, str, dict[str, str], list[TikTokVideoInfo]]:
+    title = _meta(page, r"<title[^>]*>(.*?)</title>") if page else ""
+    desc = _meta(page, r'<meta[^>]+name=["\']description["\'][^>]+content=["\'](.*?)["\']') if page else ""
+    blobs = _json_blobs(page) if page else []
+    profile, json_videos = _extract_from_json(blobs, username) if blobs else ({}, [])
+    text_videos = _extract_videos_from_text(page, profile.get("username", username)) if page else []
+    videos_by_url: dict[str, TikTokVideoInfo] = {}
+    for video in json_videos + text_videos:
+        if video.url:
+            existing = videos_by_url.get(video.url)
+            if existing and not existing.title and video.title:
+                videos_by_url[video.url] = video
+            else:
+                videos_by_url.setdefault(video.url, video)
+    return title, desc, profile, list(videos_by_url.values())[:40]
+
 def analyze_tiktok_profile_url(url: str) -> TikTokProfileReport:
     init_db()
     profile_url = normalize_url(url)
@@ -242,17 +346,42 @@ def analyze_tiktok_profile_url(url: str) -> TikTokProfileReport:
     page = ""
     try:
         page = fetch_url(profile_url)
+        notes.append("Fetched public TikTok HTML.")
     except Exception as exc:
-        notes.append(f"TikTok page fetch failed: {exc}")
-    title = _meta(page, r"<title[^>]*>(.*?)</title>") if page else ""
-    desc = _meta(page, r'<meta[^>]+name=["\']description["\'][^>]+content=["\'](.*?)["\']') if page else ""
-    blobs = _json_blobs(page) if page else []
-    profile, json_videos = _extract_from_json(blobs, username) if blobs else ({}, [])
-    text_videos = _extract_videos_from_text(page, profile.get("username", username)) if page else []
-    videos_by_url: dict[str, TikTokVideoInfo] = {}
-    for video in json_videos + text_videos:
-        if video.url:
-            videos_by_url.setdefault(video.url, video)
+        notes.append(f"Public TikTok page fetch failed: {exc}")
+    title, desc, profile, videos = _extract_page_data(page, username)
+    if not videos:
+        try:
+            session_page, session_note = _fetch_with_browser_session(profile_url)
+            if session_page:
+                session_title, session_desc, session_profile, session_videos = _extract_page_data(session_page, username)
+                notes.append("Retried with saved browser TikTok session: " + session_note)
+                if session_videos or len(session_page) > len(page):
+                    page = session_page
+                    title = session_title or title
+                    desc = session_desc or desc
+                    profile = {**profile, **session_profile}
+                    videos = session_videos or videos
+            else:
+                notes.append("Browser-session retry unavailable: " + session_note)
+        except Exception as exc:
+            notes.append(f"Browser-session TikTok retry failed: {exc}")
+    if not videos:
+        try:
+            rendered_page, render_note = _fetch_with_playwright_session(profile_url)
+            if rendered_page:
+                render_title, render_desc, render_profile, render_videos = _extract_page_data(rendered_page, username)
+                notes.append(render_note)
+                if render_videos or len(rendered_page) > len(page):
+                    page = rendered_page
+                    title = render_title or title
+                    desc = render_desc or desc
+                    profile = {**profile, **render_profile}
+                    videos = render_videos or videos
+            else:
+                notes.append("Playwright browser-session render unavailable: " + render_note)
+        except Exception as exc:
+            notes.append(f"Playwright browser-session render failed: {exc}")
     report = TikTokProfileReport(
         profile_url=profile_url,
         username=profile.get("username", username),
@@ -262,17 +391,17 @@ def analyze_tiktok_profile_url(url: str) -> TikTokProfileReport:
         following_count=profile.get("following", ""),
         heart_count=profile.get("hearts", ""),
         video_count=profile.get("videos", ""),
-        recent_videos=list(videos_by_url.values())[:40],
+        recent_videos=videos[:40],
         notes=notes,
     )
     if not page:
-        report.notes.append("No public HTML was available, so the report is a saved profile shell.")
+        report.notes.append("No TikTok HTML was available, so the report is a saved profile shell.")
     elif not report.recent_videos:
-        report.notes.append("No public videos were exposed in the fetched HTML. Try again later or use a browser session when TikTok allows it.")
+        report.notes.append("No recent video objects were exposed even after the available fetch attempts. TikTok may be returning a minimal or bot-protected page; open the profile in your browser, scroll the videos once, then run the analyzer again.")
     report.hashtags, report.caption_patterns, report.next_post_ideas = _caption_patterns(report.recent_videos, report.bio, title)
     report.content_gaps = _content_gaps(report)
     save_profile_snapshot(report)
-    add_job("tiktok_profile", profile_url, "done" if page else "partial", f"Saved snapshot for {report.username}")
+    add_job("tiktok_profile", profile_url, "done" if report.recent_videos else "partial", f"Saved snapshot for {report.username} with {len(report.recent_videos)} videos")
     return report
 
 

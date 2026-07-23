@@ -238,3 +238,19 @@ def format_browser_session_health() -> str:
     for browser, profile, count, status, note in rows:
         lines.append(f"- {browser}/{profile}: {status} ({count} TikTok cookies) - {note}")
     return "\n".join(lines)
+
+
+def cookie_header_for_tiktok(browser: str = "auto", profile: str = "") -> tuple[str, str]:
+    cookies, message = read_tiktok_cookies(browser, profile)
+    if not cookies:
+        return "", message
+    pairs = []
+    seen = set()
+    for cookie in cookies:
+        name = str(cookie.get("name") or "").strip()
+        value = str(cookie.get("value") or "")
+        if not name or name in seen:
+            continue
+        seen.add(name)
+        pairs.append(f"{name}={value}")
+    return "; ".join(pairs), message
