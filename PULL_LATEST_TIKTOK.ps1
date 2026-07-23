@@ -3,76 +3,82 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
-
-if (-not (Test-Path (Join-Path $Repo ".git"))) {
-    throw "Git repository not found: $Repo"
-}
-
 Set-Location $Repo
+
+if (-not (Test-Path ".git")) {
+    throw "Not a Git repository: $Repo"
+}
+
 $stamp = Get-Date -Format "yyyyMMdd-HHmmss"
-$dbPath = Join-Path $Repo "creator_library.db"
-$dbBackup = Join-Path $env:USERPROFILE "Desktop\creator_library-before-pull-$stamp.db"
+$dbBackup = $null
 
-if (Test-Path $dbPath) {
-    Copy-Item $dbPath $dbBackup -Force
-    Write-Host "Creator database backed up to $dbBackup" -ForegroundColor Cyan
+if (Test-Path ".\creator_library.db") {
+    $dbBackup = Join-Path $env:USERPROFILE "Desktop\creator_library-before-pull-$stamp.db"
+    Copy-Item ".\creator_library.db" $dbBackup -Force
+    Write-Host "Creator database backed up to $dbBackup"
 }
 
-try {
-    $dirty = @(git status --porcelain)
-    $important = @($dirty | Where-Object {
-        $_ -notmatch "creator_library\.db" -and
-        $_ -notmatch "__pycache__" -and
-        $_ -notmatch "\.pyc$" -and
-        $_ -notmatch "app-startup\.log"
-    })
+git fetch origin
+if ($LASTEXITCODE -ne 0) {
+    throw "git fetch failed."
+}
 
-    if ($important.Count -gt 0) {
-        $backupBranch = "backup-working-tree-$stamp"
-        git switch -c $backupBranch
-        git add -A
-        git commit -m "Backup working tree before pull"
-        git switch main
-        Write-Host "Uncommitted work saved on $backupBranch" -ForegroundColor Yellow
+$ahead = [int](git rev-list --count origin/main..HEAD)
+$behind = [int](git rev-list --count HEAD..origin/main)
+
+if ($ahead -gt 0) {
+    Write-Host ""
+    Write-Host "Pull stopped safely: this branch has $ahead local commit(s) not on GitHub." -ForegroundColor Yellow
+    Write-Host "Push or recover those commits first. This script will not reset them."
+    git log --oneline origin/main..HEAD
+    exit 2
+}
+
+# Generated tracked files should not block a pull.
+if (Test-Path ".\creator_library.db") {
+    git restore -- ".\creator_library.db"
+}
+$trackedCaches = git ls-files | Where-Object { $_ -match '(^|/)__pycache__/|\.pyc$' }
+foreach ($cache in $trackedCaches) {
+    git restore -- "$cache" 2>$null
+}
+
+$dirty = git status --porcelain |
+    Where-Object {
+        $_ -notmatch 'creator_library\.db$' -and
+        $_ -notmatch '__pycache__' -and
+        $_ -notmatch '\.pyc$'
     }
 
-    if (Test-Path $dbPath) {
-        git restore -- creator_library.db 2>$null
+if ($dirty) {
+    Write-Host ""
+    Write-Host "Pull stopped safely because source or untracked files are present:" -ForegroundColor Yellow
+    $dirty | ForEach-Object { Write-Host $_ }
+    Write-Host "Commit, move, or stash those files before pulling."
+    if ($dbBackup) {
+        Copy-Item $dbBackup ".\creator_library.db" -Force
+        Write-Host "Creator database restored."
     }
+    exit 3
+}
 
-    Get-ChildItem -Path ".\unified_app" -Directory -Recurse -Filter "__pycache__" -ErrorAction SilentlyContinue |
-        Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
-
-    git fetch origin
-    git checkout main
-
-    $ahead = [int](git rev-list --count origin/main..main)
-    $behind = [int](git rev-list --count main..origin/main)
-
-    if ($ahead -gt 0) {
-        $backupBranch = "backup-local-commits-$stamp"
-        git branch $backupBranch HEAD
-        git reset --hard origin/main
-        Write-Host "Local commits preserved on $backupBranch" -ForegroundColor Yellow
-    }
-    elseif ($behind -gt 0) {
-        git pull --ff-only origin main
-    }
-    else {
-        Write-Host "Repository is already current." -ForegroundColor Green
-    }
-
-    py -3 -m compileall -q unified_app
+if ($behind -gt 0) {
+    git pull --ff-only origin main
     if ($LASTEXITCODE -ne 0) {
-        throw "Python compilation failed after pulling."
+        if ($dbBackup) {
+            Copy-Item $dbBackup ".\creator_library.db" -Force
+        }
+        throw "Fast-forward pull failed."
     }
-}
-finally {
-    if (Test-Path $dbBackup) {
-        Copy-Item $dbBackup $dbPath -Force
-        Write-Host "Creator database restored." -ForegroundColor Green
-    }
+} else {
+    Write-Host "Already up to date."
 }
 
-Write-Host "TIKTOK is synchronized with origin/main." -ForegroundColor Green
-git status
+if ($dbBackup) {
+    Copy-Item $dbBackup ".\creator_library.db" -Force
+    Write-Host "Creator database restored."
+}
+
+Write-Host ""
+Write-Host "TIKTOK safely synchronized with origin/main." -ForegroundColor Green
+git status -sb
