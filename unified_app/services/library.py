@@ -33,6 +33,7 @@ def scan_local_assets() -> int:
     init_db()
     roots = [READY_DIR, ROOT / "ShortGPT-stable" / "videos", ROOT]
     seen: set[Path] = set()
+    indexed_paths: set[str] = set()
     count = 0
     with connect() as db:
         for base in roots:
@@ -41,16 +42,27 @@ def scan_local_assets() -> int:
             for path in base.rglob("*"):
                 if not path.is_file() or path.suffix.lower() not in VIDEO_EXTS:
                     continue
+                try:
+                    st = path.stat()
+                except OSError:
+                    continue
+                if st.st_size <= 0:
+                    continue
                 resolved = path.resolve()
                 if resolved in seen:
                     continue
                 seen.add(resolved)
-                st = path.stat()
+                rel = str(path.relative_to(ROOT))
+                indexed_paths.add(rel)
                 db.execute(
                     "insert into local_assets(path,size_bytes,created_at) values (?,?,?) on conflict(path) do update set size_bytes=excluded.size_bytes",
-                    (str(path.relative_to(ROOT)), st.st_size, now_iso()),
+                    (rel, st.st_size, now_iso()),
                 )
                 count += 1
+        for (asset_path,) in db.execute("select path from local_assets").fetchall():
+            candidate = ROOT / asset_path
+            if not candidate.exists() or candidate.stat().st_size <= 0:
+                db.execute("delete from local_assets where path=?", (asset_path,))
         db.commit()
     add_job("scan", "local videos", "done", f"Indexed {count} video assets")
     return count

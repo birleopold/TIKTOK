@@ -1,0 +1,15 @@
+source,status,ready_video,draft_key,asset_key,queued,message
+TiktokAutoUploader-main\VideosDirPath\branded-20260723-144852-pre-processed.mp4,failed,,,,no,"nable-libmp3lame --enable-libtheora --enable-libvo-amrwbenc --enable-libgsm --enable-libopencore-amrnb --enable-libopus --enable-libspeex --enable-libvorbis --enable-librubberband
+  libavutil      59. 39.100 / 59. 39.100
+  libavcodec     61. 19.100 / 61. 19.100
+  libavformat    61.  7.100 / 61.  7.100
+  libavdevice    61.  3.100 / 61.  3.100
+  libavfilter    10.  4.100 / 10.  4.100
+  libswscale      8.  3.100 /  8.  3.100
+  libswresample   5.  3.100 /  5.  3.100
+  libpostproc    58.  3.100 / 58.  3.100
+[mov,mp4,m4a,3gp,3g2,mj2 @ 00000275393b3c40] Format mov,mp4,m4a,3gp,3g2,mj2 detected only with low score of 1, misdetection possible!
+[mov,mp4,m4a,3gp,3g2,mj2 @ 00000275393b3c40] moov atom not found
+[in#0 @ 00000275393b38c0] Error opening input: Invalid data found when processing input
+Error opening input file C:\Users\LEOSOFT\Desktop\TIKTOK\TiktokAutoUploader-main\VideosDirPath\branded-20260723-144852-pre-processed.mp4.
+Error opening input files: Invalid data found when processing input"

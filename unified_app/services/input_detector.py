@@ -1,4 +1,4 @@
-﻿from __future__ import annotations
+from __future__ import annotations
 
 import re
 from dataclasses import dataclass
@@ -69,6 +69,17 @@ def detect_input(value: str) -> DetectionResult:
                 ["Video preparation can later add resize, trim, captions, and audio normalization."],
             )
         return DetectionResult("local_file", str(local), "Local file", "medium", ["Open folder", "Save note"], ["This file is not a known video format."])
+
+    looks_like_url = bool(re.match(r"^https?://", value, re.I) or re.match(r"^(www\.)?[^\s/]+\.[A-Za-z]{2,}(/.*)?$", value))
+    if not looks_like_url:
+        return DetectionResult(
+            "text",
+            value,
+            "Plain text idea",
+            "medium",
+            ["Generate hooks", "Generate captions", "Generate hashtags", "Create draft note"],
+            ["No network needed for text idea generation."],
+        )
 
     url = normalize_url(value)
     parsed = urlparse(url)

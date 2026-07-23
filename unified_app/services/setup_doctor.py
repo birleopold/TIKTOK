@@ -49,6 +49,14 @@ def check_chrome() -> DoctorCheck:
 
 
 
+def find_imageio_ffmpeg() -> str | None:
+    try:
+        import imageio_ffmpeg
+        return imageio_ffmpeg.get_ffmpeg_exe()
+    except Exception:
+        return None
+
+
 def find_playwright_ffmpeg() -> Path | None:
     base = Path.home() / "AppData" / "Local" / "ms-playwright"
     if not base.exists():
@@ -61,9 +69,12 @@ def find_playwright_ffmpeg() -> Path | None:
 def check_ffmpeg() -> DoctorCheck:
     if command_exists("ffmpeg"):
         return DoctorCheck("FFmpeg", "GREEN", "ffmpeg is available on PATH")
+    imageio_exe = find_imageio_ffmpeg()
+    if imageio_exe:
+        return DoctorCheck("FFmpeg", "GREEN", f"Using imageio-ffmpeg binary: {imageio_exe}")
     bundled = find_playwright_ffmpeg()
     if bundled:
-        return DoctorCheck("FFmpeg", "GREEN", f"Using Playwright bundled FFmpeg: {bundled}")
+        return DoctorCheck("FFmpeg", "YELLOW", f"Only limited Playwright FFmpeg found: {bundled}", "Install full FFmpeg or imageio-ffmpeg")
     return DoctorCheck("FFmpeg", "RED", "ffmpeg not found", "Install FFmpeg")
 
 

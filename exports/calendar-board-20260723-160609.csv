@@ -1,0 +1,24 @@
+section,key,status,title,scheduled_for,account,source
+Today,draft:112,scheduled,watermarked-20260723-153341-pre-processed,2026-07-23T18:00:00,mypage,TiktokAutoUploader-main\VideosDirPath\watermarked-20260723-153341-pre-processed.mp4
+Today,draft:36,scheduled,ready-20260723-131238-pre-processed,2026-07-23T18:00:00,,TiktokAutoUploader-main\VideosDirPath\ready-20260723-131238-pre-processed.mp4
+This week,draft:112,scheduled,watermarked-20260723-153341-pre-processed,2026-07-23T18:00:00,mypage,TiktokAutoUploader-main\VideosDirPath\watermarked-20260723-153341-pre-processed.mp4
+This week,draft:36,scheduled,ready-20260723-131238-pre-processed,2026-07-23T18:00:00,,TiktokAutoUploader-main\VideosDirPath\ready-20260723-131238-pre-processed.mp4
+This week,draft:18,scheduled,www.tiktok.com,2026-07-24T18:00:00,,https://www.tiktok.com/@leosoft_technologies
+Scheduled,draft:112,scheduled,watermarked-20260723-153341-pre-processed,2026-07-23T18:00:00,mypage,TiktokAutoUploader-main\VideosDirPath\watermarked-20260723-153341-pre-processed.mp4
+Scheduled,draft:36,scheduled,ready-20260723-131238-pre-processed,2026-07-23T18:00:00,,TiktokAutoUploader-main\VideosDirPath\ready-20260723-131238-pre-processed.mp4
+Scheduled,draft:18,scheduled,www.tiktok.com,2026-07-24T18:00:00,,https://www.tiktok.com/@leosoft_technologies
+Ready,draft:102,ready,ready-20260723-153419-pre-processed,,,TiktokAutoUploader-main\VideosDirPath\ready-20260723-153419-pre-processed.mp4
+Ready,asset:183,ready,ready-20260723-153419-pre-processed,,,ready_package: TiktokAutoUploader-main\VideosDirPath\ready-20260723-153419-pre-processed.mp4
+Ready,draft:56,ready,ready-20260723-152050-branded-20260723-144926-pre-processed,,,TiktokAutoUploader-main\VideosDirPath\ready-20260723-152050-branded-20260723-144926-pre-processed.mp4
+Ready,asset:68,ready,ready-20260723-152050-branded-20260723-144926-pre-processed,,,ready_package: TiktokAutoUploader-main\VideosDirPath\ready-20260723-152050-branded-20260723-144926-pre-processed.mp4
+Ready,draft:45,ready,ready-20260723-141239-pre-processed,,,TiktokAutoUploader-main\VideosDirPath\ready-20260723-141239-pre-processed.mp4
+Ready,asset:18,ready,ready-20260723-141239-pre-processed,,,ready_package: TiktokAutoUploader-main\VideosDirPath\ready-20260723-141239-pre-processed.mp4
+Needs account,draft:102,ready,ready-20260723-153419-pre-processed,,,TiktokAutoUploader-main\VideosDirPath\ready-20260723-153419-pre-processed.mp4
+Needs account,asset:183,ready,ready-20260723-153419-pre-processed,,,ready_package: TiktokAutoUploader-main\VideosDirPath\ready-20260723-153419-pre-processed.mp4
+Needs account,draft:56,ready,ready-20260723-152050-branded-20260723-144926-pre-processed,,,TiktokAutoUploader-main\VideosDirPath\ready-20260723-152050-branded-20260723-144926-pre-processed.mp4
+Needs account,asset:68,ready,ready-20260723-152050-branded-20260723-144926-pre-processed,,,ready_package: TiktokAutoUploader-main\VideosDirPath\ready-20260723-152050-branded-20260723-144926-pre-processed.mp4
+Needs account,draft:45,ready,ready-20260723-141239-pre-processed,,,TiktokAutoUploader-main\VideosDirPath\ready-20260723-141239-pre-processed.mp4
+Needs account,asset:18,ready,ready-20260723-141239-pre-processed,,,ready_package: TiktokAutoUploader-main\VideosDirPath\ready-20260723-141239-pre-processed.mp4
+Needs account,draft:36,scheduled,ready-20260723-131238-pre-processed,2026-07-23T18:00:00,,TiktokAutoUploader-main\VideosDirPath\ready-20260723-131238-pre-processed.mp4
+Needs account,draft:18,scheduled,www.tiktok.com,2026-07-24T18:00:00,,https://www.tiktok.com/@leosoft_technologies
+Needs account,queue:2,queued,ready-20260723-131238-pre-processed,2026-07-23T18:00:00,,TiktokAutoUploader-main\VideosDirPath\ready-20260723-131238-pre-processed.mp4

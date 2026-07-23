@@ -1,0 +1,20 @@
+section,item_1,item_2,item_3,item_4,item_5
+focus,Review today's scheduled posts and queue/upload the highest priority item.,,,,
+focus,Import TikTok cookies or run Login / Re-login before real uploads.,,,,
+focus,Schedule the next 7 draft posts so the calendar stays moving.,,,,
+focus,Add more owned/permitted sources through Content Hunt or Paste & Go.,,,,
+scheduled_today,draft:112,draft/local,watermarked-20260723-153341-pre-processed,2026-07-23T18:00:00,
+scheduled_today,draft:36,draft/local,ready-20260723-131238-pre-processed,2026-07-23T18:00:00,
+ready,draft:103,draft/local,ready-20260723-153435-audit-sample-duplicate,TiktokAutoUploader-main\VideosDirPath\ready-20260723-153435-audit-sample-duplicate.mp4,
+ready,asset:235,local_video,ready-20260723-153435-audit-sample-duplicate,ready_package: TiktokAutoUploader-main\VideosDirPath\ready-20260723-153435-audit-sample-duplicate.mp4,
+ready,draft:102,draft/local,ready-20260723-153419-pre-processed,TiktokAutoUploader-main\VideosDirPath\ready-20260723-153419-pre-processed.mp4,
+ready,asset:183,local_video,ready-20260723-153419-pre-processed,ready_package: TiktokAutoUploader-main\VideosDirPath\ready-20260723-153419-pre-processed.mp4,
+ready,draft:56,draft/local,ready-20260723-152050-branded-20260723-144926-pre-processed,TiktokAutoUploader-main\VideosDirPath\ready-20260723-152050-branded-20260723-144926-pre-processed.mp4,
+ready,asset:68,local_video,ready-20260723-152050-branded-20260723-144926-pre-processed,ready_package: TiktokAutoUploader-main\VideosDirPath\ready-20260723-152050-branded-20260723-144926-pre-processed.mp4,
+ready,draft:45,draft/local,ready-20260723-141239-pre-processed,TiktokAutoUploader-main\VideosDirPath\ready-20260723-141239-pre-processed.mp4,
+ready,asset:18,local_video,ready-20260723-141239-pre-processed,ready_package: TiktokAutoUploader-main\VideosDirPath\ready-20260723-141239-pre-processed.mp4,
+queue,3,queued,mypage,branded 20260723 144926 pre processed,TiktokAutoUploader-main\VideosDirPath\ready-20260723-152050-branded-20260723-144926-pre-processed.mp4
+queue,2,queued,no account,ready-20260723-131238-pre-processed,TiktokAutoUploader-main\VideosDirPath\ready-20260723-131238-pre-processed.mp4
+queue,1,queued,mypage,pre processed,TiktokAutoUploader-main\VideosDirPath\ready-20260723-141239-pre-processed.mp4
+blocked,No healthy TikTok account session. Import cookies or run Login / Re-login.,,,,
+blocked,Queue #2 needs an account: ready-20260723-131238-pre-processed,,,,

@@ -1,0 +1,534 @@
+Full Clearance Audit - 2026-07-23T15:35:06
+Passed: 62
+Failed: 0
+
+[PASS] core.help (0.3s, code=0)
+  cmd: --help
+  output:
+      --queue-dry-run ID    Prepare uploader command for a queue item without
+                            uploading
+      --queue-account ID ACCOUNT
+                            Assign an account to a queued upload item
+      --queue-run ID        Run uploader for a queue item
+      --queue-cancel ID     Cancel a queued or failed upload item
+      --analytics           Show local creator pipeline analytics
+      --analytics-export    Export local creator pipeline analytics report
+      --daily               Show today's creator command plan
+      --daily-export        Export today's creator command plan CSV
+      --settings            Show brand profile defaults
+      --set KEY VALUE       Set a brand/default setting
+
+[PASS] core.compileall (0.3s, code=0)
+  cmd: --check
+  output:
+    Projects checked: 6
+    Python files indexed: 194
+    Dependency check:
+      - Unified app: OK
+      - TikTok Auto Uploader: OK
+      - ShortGPT: OK
+      - Compilation Generator: OK
+      - tiktok-uploader Library: OK
+      - tiktokpy: OK
+    All project folders, launchable Python entry points, and checked dependencies are present.
+
+[PASS] doctor (4.4s, code=0)
+  cmd: --doctor
+  output:
+    [GREEN] Unified app: Python modules installed
+    [GREEN] TikTok Auto Uploader: Python modules installed
+    [GREEN] ShortGPT: Python modules installed
+    [GREEN] Compilation Generator: Python modules installed
+    [GREEN] tiktok-uploader Library: Python modules installed
+    [GREEN] tiktokpy: Python modules installed
+    [GREEN] Folders: Required folders exist
+    [GREEN] Chrome: Google Chrome found
+    [GREEN] FFmpeg: Using imageio-ffmpeg binary: C:\Users\LEOSOFT\AppData\Roaming\Python\Python314\site-packages\imageio_ffmpeg\binaries\ffmpeg-win-x86_64-v7.1.exe
+    [GREEN] ImageMagick: ImageMagick command found
+    [GREEN] Uploader CLI: Uploader CLI starts
+    [GREEN] Playwright Browser: Chromium launches
+
+[PASS] projects.list (0.4s, code=0)
+  cmd: --list
+  output:
+    [Publishing Library] tiktok-uploader Library - source available
+      tiktok-uploader-main
+      Pure Python package for browser-based TikTok uploads, auth, examples, and tests.
+      features: auth, upload, examples, tests, Playwright backend
+    [Library] tiktokpy - source available
+      tiktokpy-master
+      Python TikTok client code, quickstart scripts, models, and tests.
+      features: client, quick login, quickstart, models, tests
+    [.NET Reference] sklhdaudbus - source available
+      sklhdaudbus-master
+      Visual Studio solution indexed for completeness.
+      features: solution file, desktop source
+
+[PASS] source.files (0.4s, code=0)
+  cmd: --files
+  output:
+    unified_app\services\production_library.py
+    unified_app\services\ready_package.py
+    unified_app\services\settings.py
+    unified_app\services\setup_doctor.py
+    unified_app\services\source.py
+    unified_app\services\tiktok_profile.py
+    unified_app\services\upload_queue.py
+    unified_app\services\video_tools.py
+    unified_app\services\workflows.py
+    unified_app\ui\__init__.py
+    unified_app\ui\main_window.py
+    unified_tiktok_app.py
+
+[PASS] settings.show (0.4s, code=0)
+  cmd: --settings
+  output:
+    Brand Profile & Defaults
+      - batch_limit: 3
+      - brand_name: LEOSOFT
+      - caption_style: clear, useful, direct
+      - default_account: mypage
+      - default_hashtags: #TikTok
+      - posting_hour: 18
+      - tiktok_handle: 
+      - watermark: @leosoft
+
+[PASS] detect.tiktok_profile (0.3s, code=0)
+  cmd: --detect https://www.tiktok.com/@example
+  output:
+    Confidence: high
+    Value: https://www.tiktok.com/@example
+    
+    Recommended actions:
+      - Analyze public profile
+      - List recent public videos
+      - Save as source
+      - Generate content gaps
+      - Make draft ideas
+    
+    Notes:
+      - Uses public/browser-readable page data where possible; TikTok page changes can break scraping.
+
+[PASS] detect.local_video (0.3s, code=0)
+  cmd: --detect C:\Users\LEOSOFT\Desktop\TIKTOK\TiktokAutoUploader-main\VideosDirPath\pre-processed.mp4
+  output:
+    Type: local_video
+    Confidence: high
+    Value: C:\Users\LEOSOFT\Desktop\TIKTOK\TiktokAutoUploader-main\VideosDirPath\pre-processed.mp4
+    
+    Recommended actions:
+      - Generate caption ideas
+      - Copy to upload folder
+      - Make TikTok-ready version
+      - Create draft
+    
+    Notes:
+      - Video preparation can later add resize, trim, captions, and audio normalization.
+
+[PASS] ideas (0.4s, code=0)
+  cmd: --ideas phone repair before and after
+  output:
+    Keywords: phone, repair
+    Hashtags: #Phone #Repair #TikTok
+    Hooks:
+      - Nobody talks about phone like this.
+      - The ending is the part people will replay.
+      - Here is the quick version.
+    Captions:
+      - phone repair before and after #Phone #Repair #TikTok
+      - What would you do next? #Phone #Repair #TikTok
+      - Watch this before you scroll. #Phone #Repair #TikTok
+
+[PASS] audit.sample_exists (0.0s, code=manual)
+  output:
+    sample=C:\Users\LEOSOFT\Desktop\TIKTOK\TiktokAutoUploader-main\VideosDirPath\pre-processed.mp4
+
+[PASS] local.scan (0.5s, code=0)
+  cmd: --scan-local
+  output:
+    Indexed 11 local video assets
+
+[PASS] duplicates.temp (0.4s, code=0)
+  cmd: --duplicates C:\Users\LEOSOFT\Desktop\TIKTOK\exports\audit_workspace
+  output:
+    C:\Users\LEOSOFT\Desktop\TIKTOK\exports\duplicate-report-20260723-153324.csv (1 groups, 2 files)
+
+[PASS] clean_rename.temp (0.5s, code=0)
+  cmd: --clean-rename C:\Users\LEOSOFT\Desktop\TIKTOK\exports\audit_workspace
+  output:
+    Renamed 2 videos
+    Audit Sample Duplicate.mp4 -> audit-sample-duplicate.mp4
+    Audit Sample One.mp4 -> audit-sample-one.mp4
+
+[PASS] prepare.video (0.5s, code=0)
+  cmd: --prepare C:\Users\LEOSOFT\Desktop\TIKTOK\TiktokAutoUploader-main\VideosDirPath\pre-processed.mp4
+  output:
+    Ready for upload: TiktokAutoUploader-main\VideosDirPath\20260723-153325-pre-processed.mp4
+
+[PASS] hunt.example (1.2s, code=0)
+  cmd: --hunt https://example.com
+  output:
+    SAVED [web] Example Domain -> https://example.com (0 media links)
+
+[PASS] add_source.example (0.5s, code=0)
+  cmd: --add-source https://example.com
+  output:
+    Saved source: example.com
+
+[PASS] source_digest (0.5s, code=0)
+  cmd: --source-digest
+  output:
+      Idea: Nobody talks about repairs like this. | LEOSOFT UG LTD — Technology, repairs and support — IT & retail #Repairs #Technology #Business #Leosoft | #Repairs #Technology #Business #Leosoft #Ltd
+      Rights: Research/inspiration candidate. Verify ownership, license, and permission before reposting third-party media.
+    
+    #7 score 20 [tiktok] www.tiktok.com
+      URL: https://www.tiktok.com/@leosoft_technologies
+      Idea: Nobody talks about com like this. | www.tiktok.com #Com #Www #TikTok | #Com #Www #TikTok
+      Rights: Use as inspiration or repost only if you own it or have permission. Credit is not the same as permission.
+    
+    #1 score 20 [web] Example Domain
+      URL: https://example.com
+      Idea: Nobody talks about domain like this. | Example Domain #Domain #Example #TikTok | #Domain #Example #TikTok
+      Rights: Research/inspiration candidate. Verify ownership, license, and permission before reposting third-party media.
+
+[PASS] source_digest_export (0.7s, code=0)
+  cmd: --source-digest-export
+  output:
+    C:\Users\LEOSOFT\Desktop\TIKTOK\exports\content-sourcing-digest-20260723-153328.csv
+
+[PASS] draft_top (0.6s, code=0)
+  cmd: --draft-top 1
+  output:
+    Created 1 drafts from top candidates
+
+[PASS] make_drafts (0.8s, code=0)
+  cmd: --make-drafts
+  output:
+    Created or updated 17 drafts
+
+[PASS] drafts.list (0.6s, code=0)
+  cmd: --drafts
+  output:
+    0723-141239-pre-processed', 'ready-20260723-141239-pre-processed #Pre #Processed #Ready #Main', '#Pre #Processed #Ready #Main #Mp4 #Tiktokautouploader #TikTok', 'ready', '2026-07-23T11:12:55.135103+00:00')
+    (36, 'local', 'ready-20260723-131238-pre-processed', 'ready-20260723-131238-pre-processed #Pre #Processed #Ready #Main', '#Pre #Processed #Ready #Main #Mp4 #Tiktokautouploader #TikTok', 'scheduled', '2026-07-23T11:07:21.435843+00:00')
+    (18, 'tiktok', 'www.tiktok.com', 'www.tiktok.com #Com #Www #TikTok', '#Com #Www #TikTok', 'scheduled', '2026-07-23T10:07:26.261636+00:00')
+    (16, 'idea', 'street food video in Kampala', 'street food video in Kampala #Food #Kampala #Street #TikTok', '#Food #Kampala #Street #TikTok', 'draft', '2026-07-23T10:05:05.261937+00:00')
+    (7, 'web', 'LEOSOFT UG LTD — Technology, repairs and support — IT & retail', 'LEOSOFT UG LTD — Technology, repairs and support — IT & retail #Repairs #Technology #Business #Leosoft', '#Repairs #Technology #Business #Leosoft #Ltd #Products #
+    (3, 'local', 'pre-processed', 'pre-processed #Pre #Processed #Main #Mp4', '#Pre #Processed #Main #Mp4 #Tiktokautouploader #Videosdirpath #TikTok', 'draft', '2026-07-23T09:43:09.400365+00:00')
+    (2, 'local', 'subscribe-animation', 'subscribe-animation #Animation #Subscribe #Mp4 #Public', '#Animation #Subscribe #Mp4 #Public #Shortgpt #Stable #TikTok', 'draft', '2026-07-23T09:43:09.395509+00:00')
+    (1, 'web', 'Example Domain', 'Example Domain #Domain #Example #TikTok', '#Domain #Example #TikTok', 'draft', '2026-07-23T09:43:09.389781+00:00')
+
+[PASS] export_plan (0.7s, code=0)
+  cmd: --export-plan 2
+  output:
+    C:\Users\LEOSOFT\Desktop\TIKTOK\exports\draft-posting-plan-20260723-153331.csv
+
+[PASS] today (0.7s, code=0)
+  cmd: --today 2
+  output:
+    (70, 'local', 'branded-20260723-144852-pre-processed', 'branded-20260723-144852-pre-processed #Branded #Pre #Processed #Main', '#Branded #Pre #Processed #Main #Mp4 #Tiktokautouploader #TikTok', 'TiktokAutoUploader-main\\VideosDirPath\\brand
+    (69, 'local', 'watermarked-20260723-144853-pre-processed', 'watermarked-20260723-144853-pre-processed #Pre #Processed #Watermarked #Main', '#Pre #Processed #Watermarked #Main #Mp4 #Tiktokautouploader #TikTok', 'TiktokAutoUploader-main\\Vide
+
+[PASS] export_today (0.8s, code=0)
+  cmd: --export-today 2
+  output:
+    C:\Users\LEOSOFT\Desktop\TIKTOK\exports\what-to-post-today-20260723.csv
+
+[PASS] calendar (0.6s, code=0)
+  cmd: --calendar 2
+  output:
+    C:\Users\LEOSOFT\Desktop\TIKTOK\exports\draft-posting-plan-20260723-153333.csv
+
+[PASS] tiktok_profile.partial (1.3s, code=0)
+  cmd: --tiktok-profile https://www.tiktok.com/@example
+  output:
+      - Nobody talks about this enough.
+      - The ending is the part people will replay.
+      - Here is the quick version.
+    
+    Content gaps:
+      - Add or expose recent public videos so the app can compare caption and topic patterns.
+      - Try a behind-the-scenes post that shows the process, setup, or mistake before the result.
+      - Add a simple how-to or quick-tip post for search-friendly discovery.
+      - Keep at least five recent public posts visible for stronger local analytics.
+    
+    Notes:
+      - No public videos were exposed in the fetched HTML. Try again later or use a browser session when TikTok allows it.
+
+[PASS] profile_snapshots (0.4s, code=0)
+  cmd: --profile-snapshots
+  output:
+    (7, '@example', '', '', '', 'https://www.tiktok.com/@example', '2026-07-23T12:33:34.403209+00:00')
+    (6, '@leosoft_technologies', '', '', '', 'https://www.tiktok.com/@leosoft_technologies', '2026-07-23T12:22:50.930288+00:00')
+    (5, '@leosoft_technologies', '', '', '', 'https://www.tiktok.com/@leosoft_technologies', '2026-07-23T11:33:35.682665+00:00')
+    (4, '@example', '', '', '', 'https://www.tiktok.com/@example', '2026-07-23T11:05:30.932531+00:00')
+    (3, '@leosoft_technologies', '', '', '', 'https://www.tiktok.com/@leosoft_technologies', '2026-07-23T11:04:38.683089+00:00')
+    (2, '@example', '', '', '', 'https://www.tiktok.com/@example', '2026-07-23T11:03:34.005984+00:00')
+    (1, '@example', '', '', '', 'https://www.tiktok.com/@example', '2026-07-23T11:03:26.946470+00:00')
+
+[PASS] workflows.list (0.4s, code=0)
+  cmd: --workflows
+  output:
+    ai_short: [GREEN] Make AI Short - Create an AI-assisted short with script, voiceover, captions, media, and render support.
+    compilation: [GREEN] Make Compilation - Build a compilation using the clip server, review editor, and video generator.
+    upload: [GREEN] Upload Video - Upload a ready video using saved TikTok browser sessions.
+    schedule: [GREEN] Schedule Posts - Export a posting plan and open upload tools for scheduling work.
+    translate: [GREEN] Translate/Dub Video - Translate or dub an existing video using ShortGPT's translation tooling.
+    caption: [GREEN] Caption Video - Generate local hooks, captions, hashtags, and draft rows from your library.
+    batch_prepare: [GREEN] Batch Prepare Folder - Index local videos and prepare them as drafts for later upload.
+    repurpose_youtube: [GREEN] Repurpose YouTube Short - Paste a YouTube link, create TikTok captions, and prepare the upload flow.
+    source_tools: [GREEN] Open Source Tools - Open the project workspace for advanced inspection and manual editing.
+
+[PASS] workflow_info.caption (0.4s, code=0)
+  cmd: --workflow-info caption
+  output:
+    Inputs:
+      - Hunted links or local videos
+    Outputs:
+      - Draft captions
+      - Hashtags
+      - Hooks
+    Steps:
+      1. Read library
+      2. Generate keyword set
+      3. Create/update drafts
+    Notes:
+      - Ready
+
+[PASS] workflow.caption (0.6s, code=0)
+  cmd: --workflow caption
+  output:
+    Created or updated 17 caption drafts
+
+[PASS] paste_go.text (0.5s, code=0)
+  cmd: --paste-go audit idea for phone repair
+  output:
+      - No network needed for text idea generation.
+    
+    Idea draft created.
+    Hashtags: #Audit #Idea #Phone #Repair #TikTok
+    Hooks:
+      - Nobody talks about audit like this.
+      - The ending is the part people will replay.
+      - Here is the quick version.
+    Captions:
+      - audit idea for phone repair #Audit #Idea #Phone #Repair
+      - What would you do next? #Audit #Idea #Phone #Repair
+      - Watch this before you scroll. #Audit #Idea #Phone #Repair
+
+[PASS] paste_action.text (0.5s, code=0)
+  cmd: --paste-action audit idea for phone repair
+  output:
+    Created idea draft
+
+[PASS] thumbnail (1.3s, code=0)
+  cmd: --thumbnail C:\Users\LEOSOFT\Desktop\TIKTOK\TiktokAutoUploader-main\VideosDirPath\pre-processed.mp4
+  output:
+    C:\Users\LEOSOFT\Desktop\TIKTOK\exports\thumb-pre-processed.jpg
+
+[PASS] extract_audio (1.5s, code=0)
+  cmd: --extract-audio C:\Users\LEOSOFT\Desktop\TIKTOK\TiktokAutoUploader-main\VideosDirPath\pre-processed.mp4
+  output:
+    C:\Users\LEOSOFT\Desktop\TIKTOK\exports\audio-pre-processed.mp3
+
+[PASS] srt (0.6s, code=0)
+  cmd: --srt C:\Users\LEOSOFT\Desktop\TIKTOK\TiktokAutoUploader-main\VideosDirPath\pre-processed.mp4 Audit caption text for testing
+  output:
+    C:\Users\LEOSOFT\Desktop\TIKTOK\exports\captions-pre-processed.srt
+
+[PASS] watermark (6.9s, code=0)
+  cmd: --watermark C:\Users\LEOSOFT\Desktop\TIKTOK\TiktokAutoUploader-main\VideosDirPath\pre-processed.mp4 @audit
+  output:
+    C:\Users\LEOSOFT\Desktop\TIKTOK\TiktokAutoUploader-main\VideosDirPath\watermarked-20260723-153341-pre-processed.mp4
+
+[PASS] burn_caption (8.0s, code=0)
+  cmd: --burn-caption C:\Users\LEOSOFT\Desktop\TIKTOK\TiktokAutoUploader-main\VideosDirPath\pre-processed.mp4 Audit caption title
+  output:
+    C:\Users\LEOSOFT\Desktop\TIKTOK\TiktokAutoUploader-main\VideosDirPath\captioned-20260723-153348-pre-processed.mp4
+
+[PASS] brand_video (8.1s, code=0)
+  cmd: --brand-video C:\Users\LEOSOFT\Desktop\TIKTOK\TiktokAutoUploader-main\VideosDirPath\pre-processed.mp4 Audit branded caption @audit
+  output:
+    C:\Users\LEOSOFT\Desktop\TIKTOK\TiktokAutoUploader-main\VideosDirPath\branded-20260723-153356-pre-processed.mp4
+
+[PASS] tiktok_ready (14.8s, code=0)
+  cmd: --tiktok-ready C:\Users\LEOSOFT\Desktop\TIKTOK\TiktokAutoUploader-main\VideosDirPath\pre-processed.mp4
+  output:
+    C:\Users\LEOSOFT\Desktop\TIKTOK\TiktokAutoUploader-main\VideosDirPath\ready-20260723-153404-pre-processed.mp4
+
+[PASS] ready_package (16.5s, code=0)
+  cmd: --ready-package C:\Users\LEOSOFT\Desktop\TIKTOK\TiktokAutoUploader-main\VideosDirPath\pre-processed.mp4
+  output:
+    Source: C:\Users\LEOSOFT\Desktop\TIKTOK\TiktokAutoUploader-main\VideosDirPath\pre-processed.mp4
+    Ready video: C:\Users\LEOSOFT\Desktop\TIKTOK\TiktokAutoUploader-main\VideosDirPath\ready-20260723-153419-pre-processed.mp4
+    Thumbnail: C:\Users\LEOSOFT\Desktop\TIKTOK\exports\thumb-ready-20260723-153419-pre-processed.jpg
+    Audio: C:\Users\LEOSOFT\Desktop\TIKTOK\exports\audio-ready-20260723-153419-pre-processed.mp3
+    Draft key: draft:102
+    Asset key: asset:183
+    
+    Caption:
+    pre processed #Pre #Processed #Desktop #Leosoft
+    
+    Hashtags:
+    #Pre #Processed #Desktop #Leosoft #Main #Mp4 #TikTok
+
+[PASS] batch_campaign.temp (18.2s, code=0)
+  cmd: --batch-campaign C:\Users\LEOSOFT\Desktop\TIKTOK\exports\audit_workspace --batch-limit 1
+  output:
+    Batch Campaign Builder
+    Folder: C:\Users\LEOSOFT\Desktop\TIKTOK\exports\audit_workspace
+    Videos scanned: 2
+    Processed: 1
+    Queued: 0
+    Failed: 0
+    Report: C:\Users\LEOSOFT\Desktop\TIKTOK\exports\batch-campaign-20260723-153435.csv
+    
+    Details:
+    Clean rename: 0 files
+    Duplicate report: exports\duplicate-report-20260723-153435.csv (1 groups, 2 files)
+    READY exports\audit_workspace\audit-sample-duplicate.mp4 -> TiktokAutoUploader-main\VideosDirPath\ready-20260723-153435-audit-sample-duplicate.mp4
+
+[PASS] library.summary (0.8s, code=0)
+  cmd: --library-summary
+  output:
+    drafts.draft: 16
+    drafts.ready: 4
+    drafts.scheduled: 2
+    assets.local: 16
+    assets.ready: 4
+    candidates.candidate: 3
+
+[PASS] library.list (0.7s, code=0)
+  cmd: --library
+  output:
+    ('asset:8', 'local_video', 'ready-20260723-131238-pre-processed', 'local', '', '', 'TiktokAutoUploader-main\\VideosDirPath\\ready-20260723-131238-pre-processed.mp4')
+    ('draft:18', 'draft/tiktok', 'www.tiktok.com', 'scheduled', '2026-07-24T18:00:00', '', 'https://www.tiktok.com/@leosoft_technologies')
+    ('candidate:7', 'candidate/tiktok', 'www.tiktok.com', 'candidate', '', '', 'https://www.tiktok.com/@leosoft_technologies')
+    ('draft:16', 'draft/idea', 'street food video in Kampala', 'draft', '', '', 'street food video in Kampala')
+    ('draft:7', 'draft/web', 'LEOSOFT UG LTD — Technology, repairs and support — IT & retail', 'draft', '', '', 'https://leosoftug.com')
+    ('candidate:2', 'candidate/web', 'LEOSOFT UG LTD — Technology, repairs and support — IT & retail', 'candidate', '', '', 'https://leosoftug.com')
+    ('draft:3', 'draft/local', 'pre-processed', 'draft', '', '', 'TiktokAutoUploader-main\\VideosDirPath\\pre-processed.mp4')
+    ('draft:2', 'draft/local', 'subscribe-animation', 'draft', '', '', 'ShortGPT-stable\\public\\subscribe-animation.mp4')
+    ('draft:1', 'draft/web', 'Example Domain', 'draft', '', '', 'https://example.com')
+    ('candidate:1', 'candidate/web', 'Example Domain', 'candidate', '', '', 'https://example.com')
+    ('asset:2', 'local_video', 'subscribe-animation', 'local', '', '', 'ShortGPT-stable\\public\\subscribe-animation.mp4')
+    ('asset:1', 'local_video', 'pre-processed', 'local', '', '', 'TiktokAutoUploader-main\\VideosDirPath\\pre-processed.mp4')
+
+[PASS] library.export (0.6s, code=0)
+  cmd: --library-export
+  output:
+    C:\Users\LEOSOFT\Desktop\TIKTOK\exports\production-library-20260723-153455.csv
+
+[PASS] library.rebuild (1.1s, code=0)
+  cmd: --library-rebuild
+  output:
+    Rebuilt library: 18 assets, 23 drafts
+
+[PASS] schedule_drafts (0.6s, code=0)
+  cmd: --schedule-drafts 1
+  output:
+    Scheduled 1 drafts
+
+[PASS] analytics (0.5s, code=0)
+  cmd: --analytics
+  output:
+    Accounts:
+      - none: 0
+    
+    Totals:
+      - jobs: 288
+      - profile_snapshots: 7
+      - sources: 4
+    
+    Recommended next actions:
+      - Import TikTok cookies or run Login / Re-login before real uploads.
+      - Schedule the next 7 draft posts so the calendar stays moving.
+      - Add more owned/permitted sources through Content Hunt or Paste & Go.
+
+[PASS] analytics_export (0.5s, code=0)
+  cmd: --analytics-export
+  output:
+    C:\Users\LEOSOFT\Desktop\TIKTOK\exports\creator-pipeline-analytics-20260723-153457.txt
+
+[PASS] daily (0.6s, code=0)
+  cmd: --daily
+  output:
+      - asset:68 [local_video] ready-20260723-152050-branded-20260723-144926-pre-processed -> ready_package: TiktokAutoUploader-main\VideosDirPath\ready-20260723-152050-branded-20260723-144926-pre-processed.mp4
+      - draft:45 [draft/local] ready-20260723-141239-pre-processed -> TiktokAutoUploader-main\VideosDirPath\ready-20260723-141239-pre-processed.mp4
+      - asset:18 [local_video] ready-20260723-141239-pre-processed -> ready_package: TiktokAutoUploader-main\VideosDirPath\ready-20260723-141239-pre-processed.mp4
+    
+    Upload queue:
+      - #3 queued account=mypage branded 20260723 144926 pre processed -> TiktokAutoUploader-main\VideosDirPath\ready-20260723-152050-branded-20260723-144926-pre-processed.mp4
+      - #2 queued account=no account ready-20260723-131238-pre-processed -> TiktokAutoUploader-main\VideosDirPath\ready-20260723-131238-pre-processed.mp4
+      - #1 queued account=mypage pre processed -> TiktokAutoUploader-main\VideosDirPath\ready-20260723-141239-pre-processed.mp4
+    
+    Blocked / needs attention:
+      - No healthy TikTok account session. Import cookies or run Login / Re-login.
+      - Queue #2 needs an account: ready-20260723-131238-pre-processed
+
+[PASS] daily_export (0.5s, code=0)
+  cmd: --daily-export
+  output:
+    C:\Users\LEOSOFT\Desktop\TIKTOK\exports\daily-command-2026-07-23.csv
+
+[PASS] accounts.before (0.4s, code=0)
+  cmd: --accounts
+
+[PASS] import_cookies.synthetic (0.4s, code=0)
+  cmd: --import-cookies audit_account C:\Users\LEOSOFT\Desktop\TIKTOK\exports\audit_workspace\synthetic-cookies.json
+  output:
+    Imported healthy TikTok session for audit_account: C:\Users\LEOSOFT\Desktop\TIKTOK\TiktokAutoUploader-main\CookiesDir\tiktok_session-audit_account.cookie
+
+[PASS] accounts.after_import (0.5s, code=0)
+  cmd: --accounts
+  output:
+    (4, 'audit_account', 'healthy', 'C:\\Users\\LEOSOFT\\Desktop\\TIKTOK\\TiktokAutoUploader-main\\CookiesDir\\tiktok_session-audit_account.cookie', '2026-07-23T12:35:00.487749+00:00', 'sessionid cookie found')
+
+[PASS] queue_add.sample (0.5s, code=0)
+  cmd: --queue-add C:\Users\LEOSOFT\Desktop\TIKTOK\TiktokAutoUploader-main\VideosDirPath\pre-processed.mp4
+  output:
+    Queued TiktokAutoUploader-main\VideosDirPath\pre-processed.mp4
+
+[PASS] queue_ready.default (0.5s, code=0)
+  cmd: --queue-ready
+  output:
+    Queued 3 ready items
+
+[PASS] queue.summary (0.5s, code=0)
+  cmd: --queue-summary
+  output:
+    queued: 7
+
+[PASS] queue.list (0.6s, code=0)
+  cmd: --queue
+  output:
+    (7, 'queued', 'mypage', 'TiktokAutoUploader-main\\VideosDirPath\\ready-20260723-153419-pre-processed.mp4', 'ready-20260723-153419-pre-processed', '', 'draft:102')
+    (6, 'queued', 'mypage', 'TiktokAutoUploader-main\\VideosDirPath\\ready-20260723-153435-audit-sample-duplicate.mp4', 'ready-20260723-153435-audit-sample-duplicate', '', 'draft:103')
+    (5, 'queued', 'mypage', 'TiktokAutoUploader-main\\VideosDirPath\\watermarked-20260723-153341-pre-processed.mp4', 'watermarked-20260723-153341-pre-processed', '2026-07-23T18:00:00', 'draft:112')
+    (4, 'queued', 'mypage', 'TiktokAutoUploader-main\\VideosDirPath\\pre-processed.mp4', 'pre-processed', '', '')
+    (3, 'queued', 'mypage', 'TiktokAutoUploader-main\\VideosDirPath\\ready-20260723-152050-branded-20260723-144926-pre-processed.mp4', 'branded 20260723 144926 pre processed', '', 'draft:56')
+    (2, 'queued', '', 'TiktokAutoUploader-main\\VideosDirPath\\ready-20260723-131238-pre-processed.mp4', 'ready-20260723-131238-pre-processed', '2026-07-23T18:00:00', 'draft:36')
+    (1, 'queued', 'mypage', 'TiktokAutoUploader-main\\VideosDirPath\\ready-20260723-141239-pre-processed.mp4', 'pre processed', '', 'draft:45')
+
+[PASS] queue.account.assign (0.6s, code=0)
+  cmd: --queue-account 7 audit_account
+  output:
+    Assigned audit_account to queue item 7
+
+[PASS] queue.dry_run (0.6s, code=0)
+  cmd: --queue-dry-run 7
+  output:
+    'C:\Python314\python.exe' cli.py upload -u audit_account -v ready-20260723-153419-pre-processed.mp4 -t ready-20260723-153419-pre-processed
+
+[PASS] queue.cancel (0.6s, code=0)
+  cmd: --queue-cancel 7
+  output:
+    Cancelled
+
+[PASS] cleanup.synthetic_account (0.0s, code=manual)
+  output:
+    Removed audit_account cookie and DB row
+
+[PASS] gui.startup (0.0s, code=manual)
+  output:
+    GUI OK

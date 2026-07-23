@@ -1,0 +1,26 @@
+Unified TikTok App Clearance Summary
+
+Detailed audit: exports/full-clearance-audit-20260723-153316.txt
+Automated functional checks: 62 passed, 0 failed.
+
+Areas cleared:
+- Core app startup, CLI help, project validation, dependency doctor.
+- Settings and brand defaults.
+- Input detection, Paste & Go, workflow presets.
+- Content Hunt, source digest, drafts, posting plans.
+- TikTok profile analyzer with graceful partial handling.
+- Local scans, duplicate reports, clean rename on temp folder.
+- Thumbnail, audio extraction, SRT, watermark, burned captions, branded video.
+- TikTok-ready conversion, ready package, batch campaign.
+- Production library, scheduling, analytics, daily command center.
+- Account/session listing, cookie import with synthetic cookie, upload queue, dry-run gate, queue cancellation.
+- GUI startup smoke test.
+
+Issues found and fixed during clearance:
+- Local asset scanner did not prune missing or zero-byte files. Fixed in unified_app/services/library.py.
+- Daily Command Center showed cancelled queue rows as active queue work. Fixed in unified_app/services/daily_command.py.
+- Zero-byte failed MP4 artifacts were removed from the uploader folder.
+- Audit-labeled temporary media/database rows were cleaned after testing.
+
+Remaining external blocker:
+- No healthy real TikTok session is present yet. Real upload remains correctly blocked until Login / Re-login or Import Cookies creates a healthy account session.

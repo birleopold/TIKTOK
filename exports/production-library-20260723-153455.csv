@@ -1,0 +1,46 @@
+key,type,title,status,scheduled_for,account,source,notes,created_at
+draft:103,draft/local,audit sample duplicate,ready,,,TiktokAutoUploader-main\VideosDirPath\ready-20260723-153435-audit-sample-duplicate.mp4,Created by Make It TikTok Ready package,2026-07-23T12:34:53.102403+00:00
+asset:235,local_video,ready-20260723-153435-audit-sample-duplicate,ready,,,ready_package: TiktokAutoUploader-main\VideosDirPath\ready-20260723-153435-audit-sample-duplicate.mp4,Ready package generated,2026-07-23T12:34:50.635715+00:00
+draft:102,draft/local,pre processed,ready,,,TiktokAutoUploader-main\VideosDirPath\ready-20260723-153419-pre-processed.mp4,Created by Make It TikTok Ready package,2026-07-23T12:34:34.945102+00:00
+asset:183,local_video,ready-20260723-153419-pre-processed,ready,,,ready_package: TiktokAutoUploader-main\VideosDirPath\ready-20260723-153419-pre-processed.mp4,Ready package generated,2026-07-23T12:34:33.080664+00:00
+asset:166,local_video,ready-20260723-153404-pre-processed,local,,,TiktokAutoUploader-main\VideosDirPath\ready-20260723-153404-pre-processed.mp4,,2026-07-23T12:34:18.161989+00:00
+asset:144,local_video,branded-20260723-153356-pre-processed,local,,,TiktokAutoUploader-main\VideosDirPath\branded-20260723-153356-pre-processed.mp4,,2026-07-23T12:34:03.283283+00:00
+asset:131,local_video,captioned-20260723-153348-pre-processed,local,,,TiktokAutoUploader-main\VideosDirPath\captioned-20260723-153348-pre-processed.mp4,,2026-07-23T12:33:55.239468+00:00
+asset:123,local_video,watermarked-20260723-153341-pre-processed,local,,,TiktokAutoUploader-main\VideosDirPath\watermarked-20260723-153341-pre-processed.mp4,,2026-07-23T12:33:47.226355+00:00
+draft:100,draft/idea,audit idea for phone repair,draft,,,audit idea for phone repair,,2026-07-23T12:33:36.773984+00:00
+draft:70,draft/local,branded-20260723-144852-pre-processed,draft,,,TiktokAutoUploader-main\VideosDirPath\branded-20260723-144852-pre-processed.mp4,,2026-07-23T12:33:29.841158+00:00
+draft:69,draft/local,watermarked-20260723-144853-pre-processed,draft,,,TiktokAutoUploader-main\VideosDirPath\watermarked-20260723-144853-pre-processed.mp4,,2026-07-23T12:33:29.832257+00:00
+draft:68,draft/local,branded-20260723-144926-pre-processed,draft,,,TiktokAutoUploader-main\VideosDirPath\branded-20260723-144926-pre-processed.mp4,,2026-07-23T12:33:29.825710+00:00
+draft:67,draft/local,captioned-20260723-144926-pre-processed,draft,,,TiktokAutoUploader-main\VideosDirPath\captioned-20260723-144926-pre-processed.mp4,,2026-07-23T12:33:29.818718+00:00
+draft:65,draft/local,Audit Sample Duplicate,draft,,,exports\audit_workspace\Audit Sample Duplicate.mp4,,2026-07-23T12:33:29.806479+00:00
+draft:64,draft/local,Audit Sample One,draft,,,exports\audit_workspace\Audit Sample One.mp4,,2026-07-23T12:33:29.798913+00:00
+draft:63,draft/local,audit-sample-duplicate,draft,,,exports\audit_workspace\audit-sample-duplicate.mp4,,2026-07-23T12:33:29.793561+00:00
+draft:62,draft/local,audit-sample-one,draft,,,exports\audit_workspace\audit-sample-one.mp4,,2026-07-23T12:33:29.786603+00:00
+draft:61,draft/local,20260723-153325-pre-processed,draft,,,TiktokAutoUploader-main\VideosDirPath\20260723-153325-pre-processed.mp4,,2026-07-23T12:33:29.780301+00:00
+asset:102,local_video,20260723-153325-pre-processed,local,,,TiktokAutoUploader-main\VideosDirPath\20260723-153325-pre-processed.mp4,,2026-07-23T12:33:25.542040+00:00
+asset:101,local_video,audit-sample-one,local,,,exports\audit_workspace\audit-sample-one.mp4,,2026-07-23T12:33:25.087577+00:00
+asset:100,local_video,audit-sample-duplicate,local,,,exports\audit_workspace\audit-sample-duplicate.mp4,,2026-07-23T12:33:25.087041+00:00
+asset:90,local_video,Audit Sample One,local,,,exports\audit_workspace\Audit Sample One.mp4,,2026-07-23T12:33:24.261537+00:00
+asset:89,local_video,Audit Sample Duplicate,local,,,exports\audit_workspace\Audit Sample Duplicate.mp4,,2026-07-23T12:33:24.261147+00:00
+draft:56,draft/local,ready-20260723-152050-branded-20260723-144926-pre-processed,ready,,,TiktokAutoUploader-main\VideosDirPath\ready-20260723-152050-branded-20260723-144926-pre-processed.mp4,Created by Make It TikTok Ready package,2026-07-23T12:21:15.044682+00:00
+asset:68,local_video,ready-20260723-152050-branded-20260723-144926-pre-processed,ready,,,ready_package: TiktokAutoUploader-main\VideosDirPath\ready-20260723-152050-branded-20260723-144926-pre-processed.mp4,Ready package generated,2026-07-23T12:21:11.259671+00:00
+asset:32,local_video,captioned-20260723-144926-pre-processed,local,,,TiktokAutoUploader-main\VideosDirPath\captioned-20260723-144926-pre-processed.mp4,,2026-07-23T11:49:36.942154+00:00
+asset:31,local_video,branded-20260723-144926-pre-processed,local,,,TiktokAutoUploader-main\VideosDirPath\branded-20260723-144926-pre-processed.mp4,,2026-07-23T11:49:36.940685+00:00
+asset:28,local_video,watermarked-20260723-144853-pre-processed,local,,,TiktokAutoUploader-main\VideosDirPath\watermarked-20260723-144853-pre-processed.mp4,,2026-07-23T11:49:04.482768+00:00
+asset:24,local_video,branded-20260723-144852-pre-processed,local,,,TiktokAutoUploader-main\VideosDirPath\branded-20260723-144852-pre-processed.mp4,,2026-07-23T11:49:04.475287+00:00
+draft:46,draft/idea,41.210.186.77,draft,,,41.210.186.77,,2026-07-23T11:29:18.611452+00:00
+draft:45,draft/local,ready-20260723-141239-pre-processed,ready,,,TiktokAutoUploader-main\VideosDirPath\ready-20260723-141239-pre-processed.mp4,Created by Make It TikTok Ready package,2026-07-23T11:12:55.135103+00:00
+asset:18,local_video,ready-20260723-141239-pre-processed,ready,,,ready_package: TiktokAutoUploader-main\VideosDirPath\ready-20260723-141239-pre-processed.mp4,Ready package generated,2026-07-23T11:12:53.163083+00:00
+draft:36,draft/local,ready-20260723-131238-pre-processed,scheduled,2026-07-23T18:00:00,,TiktokAutoUploader-main\VideosDirPath\ready-20260723-131238-pre-processed.mp4,,2026-07-23T11:07:21.435843+00:00
+asset:8,local_video,ready-20260723-131238-pre-processed,local,,,TiktokAutoUploader-main\VideosDirPath\ready-20260723-131238-pre-processed.mp4,,2026-07-23T10:12:54.119462+00:00
+draft:18,draft/tiktok,www.tiktok.com,scheduled,2026-07-24T18:00:00,,https://www.tiktok.com/@leosoft_technologies,,2026-07-23T10:07:26.261636+00:00
+candidate:7,candidate/tiktok,www.tiktok.com,candidate,,,https://www.tiktok.com/@leosoft_technologies,"Review rights before reposting; use for owned, permitted, public-domain, or inspiration workflows.",2026-07-23T10:07:05.772806+00:00
+draft:16,draft/idea,street food video in Kampala,draft,,,street food video in Kampala,,2026-07-23T10:05:05.261937+00:00
+draft:7,draft/web,"LEOSOFT UG LTD — Technology, repairs and support — IT & retail",draft,,,https://leosoftug.com,,2026-07-23T09:52:34.329028+00:00
+candidate:2,candidate/web,"LEOSOFT UG LTD — Technology, repairs and support — IT & retail",candidate,,,https://leosoftug.com,"Review rights before reposting; use for owned, permitted, public-domain, or inspiration workflows.",2026-07-23T09:51:49.252538+00:00
+draft:3,draft/local,pre-processed,draft,,,TiktokAutoUploader-main\VideosDirPath\pre-processed.mp4,,2026-07-23T09:43:09.400365+00:00
+draft:2,draft/local,subscribe-animation,draft,,,ShortGPT-stable\public\subscribe-animation.mp4,,2026-07-23T09:43:09.395509+00:00
+draft:1,draft/web,Example Domain,draft,,,https://example.com,,2026-07-23T09:43:09.389781+00:00
+candidate:1,candidate/web,Example Domain,candidate,,,https://example.com,"Review rights before reposting; use for owned, permitted, public-domain, or inspiration workflows.",2026-07-23T09:40:42.645688+00:00
+asset:2,local_video,subscribe-animation,local,,,ShortGPT-stable\public\subscribe-animation.mp4,,2026-07-23T09:40:34.718784+00:00
+asset:1,local_video,pre-processed,local,,,TiktokAutoUploader-main\VideosDirPath\pre-processed.mp4,,2026-07-23T09:40:34.675417+00:00

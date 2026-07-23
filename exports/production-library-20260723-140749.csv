@@ -1,0 +1,14 @@
+key,type,title,status,scheduled_for,account,source,notes,created_at
+draft:36,draft/local,ready-20260723-131238-pre-processed,draft,,,TiktokAutoUploader-main\VideosDirPath\ready-20260723-131238-pre-processed.mp4,,2026-07-23T11:07:21.435843+00:00
+asset:8,local_video,ready-20260723-131238-pre-processed,local,,,TiktokAutoUploader-main\VideosDirPath\ready-20260723-131238-pre-processed.mp4,,2026-07-23T10:12:54.119462+00:00
+draft:18,draft/tiktok,www.tiktok.com,draft,,,https://www.tiktok.com/@leosoft_technologies,,2026-07-23T10:07:26.261636+00:00
+candidate:7,candidate/tiktok,www.tiktok.com,candidate,,,https://www.tiktok.com/@leosoft_technologies,"Review rights before reposting; use for owned, permitted, public-domain, or inspiration workflows.",2026-07-23T10:07:05.772806+00:00
+draft:16,draft/idea,street food video in Kampala,draft,,,street food video in Kampala,,2026-07-23T10:05:05.261937+00:00
+draft:7,draft/web,"LEOSOFT UG LTD — Technology, repairs and support — IT & retail",draft,,,https://leosoftug.com,,2026-07-23T09:52:34.329028+00:00
+candidate:2,candidate/web,"LEOSOFT UG LTD — Technology, repairs and support — IT & retail",candidate,,,https://leosoftug.com,"Review rights before reposting; use for owned, permitted, public-domain, or inspiration workflows.",2026-07-23T09:51:49.252538+00:00
+draft:3,draft/local,pre-processed,draft,,,TiktokAutoUploader-main\VideosDirPath\pre-processed.mp4,,2026-07-23T09:43:09.400365+00:00
+draft:2,draft/local,subscribe-animation,draft,,,ShortGPT-stable\public\subscribe-animation.mp4,,2026-07-23T09:43:09.395509+00:00
+draft:1,draft/web,Example Domain,draft,,,https://example.com,,2026-07-23T09:43:09.389781+00:00
+candidate:1,candidate/web,Example Domain,candidate,,,https://example.com,"Review rights before reposting; use for owned, permitted, public-domain, or inspiration workflows.",2026-07-23T09:40:42.645688+00:00
+asset:2,local_video,subscribe-animation,local,,,ShortGPT-stable\public\subscribe-animation.mp4,,2026-07-23T09:40:34.718784+00:00
+asset:1,local_video,pre-processed,local,,,TiktokAutoUploader-main\VideosDirPath\pre-processed.mp4,,2026-07-23T09:40:34.675417+00:00

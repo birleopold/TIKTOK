@@ -1,0 +1,29 @@
+Creator Pipeline Analytics
+
+Drafts:
+  - draft: 19
+  - ready: 4
+  - scheduled: 3
+
+Assets:
+  - local: 16
+  - ready: 4
+
+Candidates:
+  - candidate: 3
+
+Queue:
+  - queued: 3
+
+Accounts:
+  - none: 0
+
+Totals:
+  - jobs: 288
+  - profile_snapshots: 7
+  - sources: 4
+
+Recommended next actions:
+  - Import TikTok cookies or run Login / Re-login before real uploads.
+  - Schedule the next 7 draft posts so the calendar stays moving.
+  - Add more owned/permitted sources through Content Hunt or Paste & Go.
