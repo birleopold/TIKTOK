@@ -200,6 +200,167 @@ def _platform_query(keyword: str, platform: str) -> str:
     return keyword
 
 
+_SEARCH_TOKEN_RE = re.compile(r"[a-z0-9]+", re.I)
+_LOW_VALUE_SEARCH_DOMAINS = {
+    "wikipedia.org",
+    "facebook.com",
+    "instagram.com",
+    "pinterest.com",
+}
+
+
+def _search_tokens(value: str) -> list[str]:
+    return _SEARCH_TOKEN_RE.findall((value or "").lower())
+
+
+def _normalized_phrase(value: str) -> str:
+    return " ".join(_search_tokens(value))
+
+
+def _query_variants(keyword: str, platform: str) -> list[str]:
+    keyword = " ".join((keyword or "").split())
+    variants = [_platform_query(f'"{keyword}"', platform)]
+    if any(ch.isdigit() for ch in keyword):
+        variants.extend(
+            [
+                _platform_query(f"{keyword} review specifications", platform),
+                _platform_query(f"{keyword} used price", platform),
+            ]
+        )
+    else:
+        variants.append(_platform_query(keyword, platform))
+
+    unique: list[str] = []
+    for query in variants:
+        if query not in unique:
+            unique.append(query)
+    return unique
+
+
+def _low_value_domain(host: str) -> str:
+    host = (host or "").lower().rstrip(".")
+    for domain in _LOW_VALUE_SEARCH_DOMAINS:
+        if _host_matches(host, domain):
+            return domain
+    return ""
+
+
+def _score_search_result(
+    row: dict[str, str],
+    keyword: str,
+) -> tuple[int, int, int] | None:
+    terms = list(dict.fromkeys(_search_tokens(keyword)))
+    if not terms:
+        return None
+
+    title = _normalized_phrase(row.get("title", ""))
+    description = _normalized_phrase(row.get("description", ""))
+    url = _decode_search_url(row.get("url", ""))
+    parsed = urllib.parse.urlsplit(url)
+    url_text = _normalized_phrase(
+        " ".join(
+            [
+                parsed.hostname or "",
+                urllib.parse.unquote(parsed.path),
+                urllib.parse.unquote(parsed.query),
+            ]
+        )
+    )
+
+    title_tokens = set(_search_tokens(title))
+    description_tokens = set(_search_tokens(description))
+    url_tokens = set(_search_tokens(url_text))
+    all_tokens = title_tokens | description_tokens | url_tokens
+
+    matched = [term for term in terms if term in all_tokens]
+    numeric_terms = [term for term in terms if any(ch.isdigit() for ch in term)]
+
+    if numeric_terms:
+        minimum_matches = len(terms)
+    elif len(terms) <= 2:
+        minimum_matches = len(terms)
+    else:
+        minimum_matches = max(2, (len(terms) + 1) // 2)
+
+    if len(matched) < minimum_matches:
+        return None
+
+    phrase = _normalized_phrase(keyword)
+    combined = " ".join([title, description, url_text])
+    score = 0
+
+    if phrase and phrase in title:
+        score += 140
+    elif phrase and phrase in combined:
+        score += 80
+
+    score += sum(28 for term in terms if term in title_tokens)
+    score += sum(10 for term in terms if term in description_tokens)
+    score += sum(7 for term in terms if term in url_tokens)
+    score += len(matched) * 12
+
+    path = (parsed.path or "").strip("/")
+    if not path:
+        score -= 35
+
+    low_value = _low_value_domain(parsed.hostname or "")
+    query_mentions_domain = low_value and low_value.split(".", 1)[0] in terms
+    if low_value and not query_mentions_domain:
+        score -= 100
+
+    if score <= 0:
+        return None
+    return score, len(matched), len(terms)
+
+
+def _rank_search_results(
+    rows: list[dict[str, str]],
+    keyword: str,
+    limit: int,
+) -> list[dict[str, str]]:
+    scored: list[dict[str, str]] = []
+    seen_urls: set[str] = set()
+
+    for original in rows:
+        row = dict(original)
+        url = _decode_search_url(row.get("url", ""))
+        if not url or url in seen_urls:
+            continue
+        seen_urls.add(url)
+        row["url"] = url
+
+        relevance = _score_search_result(row, keyword)
+        if relevance is None:
+            continue
+
+        score, matched, total = relevance
+        row["_score"] = str(score)
+        row["_matched"] = str(matched)
+        row["_total"] = str(total)
+        scored.append(row)
+
+    scored.sort(
+        key=lambda row: (
+            int(row["_score"]),
+            int(row["_matched"]),
+            len(row.get("description", "")),
+        ),
+        reverse=True,
+    )
+
+    selected: list[dict[str, str]] = []
+    host_counts: dict[str, int] = {}
+    for row in scored:
+        host = (urllib.parse.urlsplit(row["url"]).hostname or "").lower()
+        if host_counts.get(host, 0) >= 2:
+            continue
+        host_counts[host] = host_counts.get(host, 0) + 1
+        selected.append(row)
+        if len(selected) >= limit:
+            break
+    return selected
+
+
 def _decode_search_url(value: str) -> str:
     value = html.unescape((value or "").strip())
     if value.startswith("//"):
@@ -322,48 +483,86 @@ def search_keywords(
     keyword = " ".join((keyword or "").split())
     if not keyword:
         return [], ["Search keyword is empty"]
+
     limit = max(1, min(int(limit or 10), SEARCH_LIMIT_MAX))
-    search_query = _platform_query(keyword, platform)
     provider_errors: list[str] = []
     raw_results: list[dict[str, str]] = []
+    seen_search_urls: set[str] = set()
+    fetch_limit = min(100, max(30, limit * 8))
 
-    try:
-        raw_results = _duckduckgo_results(search_query, limit * 2)
-    except Exception as exc:
-        provider_errors.append(f"DuckDuckGo search failed: {exc}")
-
-    if not raw_results:
+    for search_query in _query_variants(keyword, platform):
         try:
-            raw_results = _bing_rss_results(search_query, limit * 2)
+            provider_rows = _duckduckgo_results(search_query, fetch_limit)
         except Exception as exc:
-            provider_errors.append(f"Bing fallback failed: {exc}")
+            provider_errors.append(f"DuckDuckGo search failed for {search_query}: {exc}")
+            provider_rows = []
+
+        for row in provider_rows:
+            url = _decode_search_url(row.get("url", ""))
+            if url and url not in seen_search_urls:
+                seen_search_urls.add(url)
+                raw_results.append(row)
+
+        if len(raw_results) < limit * 4:
+            try:
+                provider_rows = _bing_rss_results(search_query, fetch_limit)
+            except Exception as exc:
+                provider_errors.append(f"Bing search failed for {search_query}: {exc}")
+                provider_rows = []
+
+            for row in provider_rows:
+                url = _decode_search_url(row.get("url", ""))
+                if url and url not in seen_search_urls:
+                    seen_search_urls.add(url)
+                    raw_results.append(row)
+
+    platform_rows = [
+        row
+        for row in raw_results
+        if _matches_platform(_decode_search_url(row.get("url", "")), platform)
+    ]
+    ranked_results = _rank_search_results(platform_rows, keyword, limit)
 
     found: list[Candidate] = []
-    seen: set[str] = set()
-    for row in raw_results:
-        url = _decode_search_url(row.get("url", ""))
-        if not url.startswith(("http://", "https://")):
-            continue
-        if not _matches_platform(url, platform) or url in seen:
-            continue
-        seen.add(url)
+    for row in ranked_results:
+        url = row["url"]
+        matched = row.get("_matched", "0")
+        total = row.get("_total", "0")
+        score = row.get("_score", "0")
         candidate = Candidate(
             url,
             row.get("title", "") or urllib.parse.urlparse(url).netloc,
             row.get("description", ""),
             classify_url(url),
             [],
-            f"Found from keyword search: {keyword}. Review rights before reuse; treat as research or inspiration unless permission is confirmed.",
+            (
+                f"Found from keyword search: {keyword}. "
+                f"Matched {matched}/{total} query terms; relevance score {score}. "
+                "Review rights before reuse; treat as research or inspiration "
+                "unless permission is confirmed."
+            ),
         )
         save_candidate(candidate)
         found.append(candidate)
-        add_job("keyword_hunt", keyword, "done", f"{candidate.source_type}: {candidate.title}")
-        if len(found) >= limit:
-            break
+        add_job(
+            "keyword_hunt",
+            keyword,
+            "done",
+            f"score={score} {candidate.source_type}: {candidate.title}",
+        )
 
     errors: list[str] = []
     if not found:
-        errors.extend(provider_errors or [f"No results found for: {keyword}"])
+        errors.extend(
+            provider_errors
+            or [
+                (
+                    f"No strongly relevant results found for: {keyword}. "
+                    "Try All, add words such as review/specifications, or remove "
+                    "unnecessary words."
+                )
+            ]
+        )
         add_job("keyword_hunt", keyword, "failed", "; ".join(errors))
     return found, errors
 
